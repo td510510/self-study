@@ -1,0 +1,18 @@
+# Không copy những thứ này vào ảnh:
+#   · làm ảnh phình to
+#   · node_modules build ở máy khác kiến trúc là hỏng
+#   · .env chứa BÍ MẬT — tuyệt đối không đưa vào ảnh
+node_modules
+npm-debug.log
+.env
+.env.*
+!.env.example
+.git
+.gitignore
+test
+uploads
+data
+*.md
+Dockerfile
+.dockerignore
+docker-compose*.yml

@@ -1,0 +1,113 @@
+# Buổi 41 — CD: build ảnh Docker và deploy khi có tag release.
+#
+# Vì sao tách khỏi CI? Vì CI chạy MỌI push, còn CD chỉ chạy khi
+# ta CHỦ ĐỘNG quyết định phát hành.
+
+name: CD
+
+on:
+  push:
+    tags: ['v*']            # chỉ chạy khi đẩy tag v1.0.0, v1.2.3...
+  workflow_dispatch: {}     # cho phép bấm nút chạy tay
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/shop-api
+
+jobs:
+  build-va-day:
+    name: Build & đẩy ảnh Docker
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write         # cần để đẩy ảnh lên GitHub Container Registry
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Buildx cho phép cache tầng Docker giữa các lần chạy CI
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Đăng nhập registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          # ⚠️ KHÔNG BAO GIỜ hardcode mật khẩu.
+          # GITHUB_TOKEN được GitHub cấp tự động, hết hạn sau mỗi lần chạy.
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Xác định tag cho ảnh
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          # Sinh nhiều tag: v1.2.3, v1.2, và sha commit.
+          # Tag theo SHA cho phép QUAY LẠI chính xác phiên bản bất kỳ.
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,format=long
+
+      - name: Build & đẩy
+        uses: docker/build-push-action@v6
+        with:
+          context: code/project-02-ecommerce
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # Cache tầng Docker qua GitHub Actions cache —
+          # build lần sau nhanh hơn nhiều (buổi 27)
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy lên máy chủ
+    needs: build-va-day
+    runs-on: ubuntu-latest
+
+    # Environment cho phép đặt yêu cầu PHÊ DUYỆT THỦ CÔNG
+    # trước khi deploy production — cấu hình trong Settings của repo.
+    environment:
+      name: production
+      url: https://shop.example.com
+
+    steps:
+      - name: Deploy qua SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -e
+            cd /srv/shop
+
+            # 1. Kéo ảnh mới
+            docker compose pull api
+
+            # 2. Chạy migration TRƯỚC khi đổi sang bản mới.
+            #    ⚠️ Migration phải TƯƠNG THÍCH NGƯỢC — xem giáo án.
+            docker compose run --rm migrate
+
+            # 3. Khởi động bản mới.
+            #    --no-deps để không khởi động lại postgres/redis.
+            docker compose up -d --no-deps api
+
+            # 4. Chờ health check xanh
+            for i in $(seq 1 30); do
+              if curl -fs http://localhost:3000/health > /dev/null; then
+                echo "Health check OK"
+                exit 0
+              fi
+              sleep 2
+            done
+
+            echo "Health check THẤT BẠI — quay lại bản cũ"
+            docker compose rollback api 2>/dev/null || docker compose up -d --no-deps api
+            exit 1
+
+      - name: Báo kết quả
+        if: always()
+        run: echo "Deploy ${{ job.status }}"

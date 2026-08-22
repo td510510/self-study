@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  email    String @unique
+  ten      String
+
+  /// LƯU HASH, KHÔNG BAO GIỜ LƯU MẬT KHẨU THÔ.
+  /// Tên cột nói rõ điều đó để người đọc code sau này không nhầm.
+  matKhauHash String
+
+  vaiTro   VaiTro  @default(user)
+
+  /// Refresh token được lưu ở database để CÓ THỂ THU HỒI.
+  /// Đây là lý do refresh token khác access token — xem giáo án.
+  refreshTokens RefreshToken[]
+
+  /// Bài viết do người này sở hữu — dùng để dạy phân quyền theo CHỦ SỞ HỮU
+  baiViets BaiViet[]
+
+  taoLuc   DateTime @default(now())
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+
+  /// Lưu HASH của token, không lưu token thô.
+  /// Nếu database bị lộ, kẻ tấn công vẫn không dùng được token.
+  tokenHash String   @unique
+
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  hetHanLuc DateTime
+  thuHoiLuc DateTime?
+
+  taoLuc    DateTime @default(now())
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+/// Tài nguyên có CHỦ SỞ HỮU — trọng tâm buổi 16
+model BaiViet {
+  id       Int     @id @default(autoincrement())
+  tieuDe   String
+  noiDung  String
+  daDang   Boolean @default(false)
+
+  /// Ai sở hữu bài này. Đây là cột quyết định mọi phép kiểm tra quyền.
+  tacGiaId Int
+  tacGia   User @relation(fields: [tacGiaId], references: [id], onDelete: Cascade)
+
+  taoLuc   DateTime  @default(now())
+  suaLuc   DateTime? @updatedAt
+
+  @@index([tacGiaId])
+  @@map("bai_viets")
+}
+
+enum VaiTro {
+  user
+  bienTap
+  admin
+}

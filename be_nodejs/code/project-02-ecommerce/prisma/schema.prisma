@@ -1,0 +1,209 @@
+// Project 2 — E-commerce mini API
+//
+// THIẾT KẾ SCHEMA LÀ QUYẾT ĐỊNH KHÓ SỬA NHẤT CỦA DỰ ÁN.
+// Đọc kỹ các ghi chú — mỗi lựa chọn ở đây đều có lý do.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ═══════════════════════════════════════════════════════════════
+// NGƯỜI DÙNG & XÁC THỰC
+// ═══════════════════════════════════════════════════════════════
+
+model User {
+  id          Int     @id @default(autoincrement())
+  email       String  @unique
+  ten         String
+  matKhauHash String
+  vaiTro      VaiTro  @default(khach)
+
+  gioHang       GioHang?
+  donHangs      DonHang[]
+  refreshTokens RefreshToken[]
+
+  taoLuc DateTime @default(now())
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        Int       @id @default(autoincrement())
+  tokenHash String    @unique
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  hetHanLuc DateTime
+  thuHoiLuc DateTime?
+  taoLuc    DateTime  @default(now())
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SẢN PHẨM
+// ═══════════════════════════════════════════════════════════════
+
+model DanhMuc {
+  id     Int    @id @default(autoincrement())
+  ten    String
+  slug   String @unique
+
+  sanPhams SanPham[]
+
+  @@map("danh_mucs")
+}
+
+model SanPham {
+  id      Int     @id @default(autoincrement())
+  ten     String
+  slug    String  @unique
+  moTa    String?
+
+  /// ⚠️ TIỀN LƯU BẰNG SỐ NGUYÊN — ĐƠN VỊ NHỎ NHẤT (đồng).
+  ///
+  /// TUYỆT ĐỐI KHÔNG dùng Float cho tiền. Số thực nhị phân không biểu diễn
+  /// chính xác được 0.1 — cộng dồn nhiều lần sẽ lệch.
+  ///   0.1 + 0.2 === 0.30000000000000004
+  /// Với đơn hàng thì đó là sai lệch tiền thật.
+  ///
+  /// Hai lựa chọn đúng: Int (đơn vị nhỏ nhất) hoặc Decimal.
+  /// Ở đây dùng Int vì VND không có đơn vị nhỏ hơn đồng.
+  giaVND Int
+
+  /// Tồn kho — cột quyết định của bài toán tranh chấp ở buổi 19
+  tonKho Int @default(0)
+
+  conBan Boolean @default(true)
+
+  danhMucId Int
+  danhMuc   DanhMuc @relation(fields: [danhMucId], references: [id])
+
+  gioHangItems GioHangItem[]
+  donHangItems DonHangItem[]
+
+  taoLuc DateTime  @default(now())
+  suaLuc DateTime? @updatedAt
+
+  // Index cho các cột hay dùng để lọc và sắp xếp
+  @@index([danhMucId])
+  @@index([conBan])
+  @@map("san_phams")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GIỎ HÀNG
+// ═══════════════════════════════════════════════════════════════
+
+model GioHang {
+  id     Int  @id @default(autoincrement())
+
+  /// @unique ở đây tạo quan hệ 1-1: mỗi user CHỈ CÓ MỘT giỏ hàng.
+  /// Không có @unique thì thành 1-n — user có nhiều giỏ, sai nghiệp vụ.
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  items GioHangItem[]
+
+  suaLuc DateTime @updatedAt
+
+  @@map("gio_hangs")
+}
+
+model GioHangItem {
+  id        Int @id @default(autoincrement())
+
+  gioHangId Int
+  gioHang   GioHang @relation(fields: [gioHangId], references: [id], onDelete: Cascade)
+
+  sanPhamId Int
+  sanPham   SanPham @relation(fields: [sanPhamId], references: [id], onDelete: Cascade)
+
+  soLuong   Int
+
+  /// Một sản phẩm chỉ xuất hiện MỘT LẦN trong một giỏ.
+  /// Thêm lần nữa thì tăng soLuong, không tạo dòng mới.
+  /// Ràng buộc này ở tầng DATABASE nên code không thể phá vỡ.
+  @@unique([gioHangId, sanPhamId])
+  @@map("gio_hang_items")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ĐƠN HÀNG
+// ═══════════════════════════════════════════════════════════════
+
+model DonHang {
+  id     Int    @id @default(autoincrement())
+
+  /// Mã đơn hiển thị cho khách. Tách khỏi id tự tăng vì:
+  ///   - id tự tăng LỘ số đơn hàng của shop cho đối thủ
+  ///   - id tự tăng khiến khách đoán được đơn của người khác (IDOR, buổi 16)
+  maDon  String @unique
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  trangThai TrangThaiDon @default(choXacNhan)
+
+  /// ⚠️ TỔNG TIỀN ĐƯỢC LƯU LẠI, không tính lại từ sản phẩm.
+  /// Lý do: giá sản phẩm THAY ĐỔI theo thời gian. Nếu tính lại,
+  /// đơn hàng năm ngoái sẽ hiển thị theo giá hôm nay — sai lịch sử,
+  /// sai kế toán, và khách hàng có quyền khiếu nại.
+  tongTienVND Int
+
+  /// Địa chỉ giao hàng cũng CHÉP LẠI tại thời điểm đặt,
+  /// vì khách có thể đổi địa chỉ sau này.
+  diaChiGiao String
+  soDienThoai String
+
+  items DonHangItem[]
+
+  taoLuc DateTime  @default(now())
+  suaLuc DateTime? @updatedAt
+
+  @@index([userId])
+  @@index([trangThai])
+  @@map("don_hangs")
+}
+
+model DonHangItem {
+  id        Int @id @default(autoincrement())
+
+  donHangId Int
+  donHang   DonHang @relation(fields: [donHangId], references: [id], onDelete: Cascade)
+
+  /// KHÔNG onDelete: Cascade ở đây!
+  /// Xoá sản phẩm KHÔNG được phép xoá lịch sử đơn hàng.
+  /// Mặc định của Prisma là Restrict — database sẽ TỪ CHỐI xoá
+  /// sản phẩm còn nằm trong đơn hàng. Đó là điều ta muốn.
+  sanPhamId Int
+  sanPham   SanPham @relation(fields: [sanPhamId], references: [id])
+
+  /// CHÉP LẠI tên và giá tại thời điểm mua — ảnh chụp lịch sử.
+  tenSanPham String
+  giaVND     Int
+  soLuong    Int
+
+  @@index([donHangId])
+  @@map("don_hang_items")
+}
+
+// ═══════════════════════════════════════════════════════════════
+
+enum VaiTro {
+  khach
+  nhanVien
+  admin
+}
+
+enum TrangThaiDon {
+  choXacNhan
+  daXacNhan
+  dangGiao
+  daGiao
+  daHuy
+}

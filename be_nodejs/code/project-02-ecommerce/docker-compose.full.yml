@@ -1,0 +1,75 @@
+# Buổi 27 — Toàn bộ hệ thống chạy trong Docker.
+#
+# Chạy:  docker compose -f docker-compose.full.yml up -d --build
+# Xoá :  docker compose -f docker-compose.full.yml down -v
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: shop
+      POSTGRES_PASSWORD: matkhau_hoc_tap
+      POSTGRES_DB: shop_db
+    volumes:
+      - shopdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U shop -d shop_db']
+      interval: 5s
+      retries: 10
+    # ⚠️ KHÔNG mở cổng ra ngoài ở production.
+    # Chỉ các service trong cùng network mới truy cập được.
+    # Ở đây mở để học viên xem được bằng công cụ bên ngoài.
+    ports:
+      - '5436:5432'
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      retries: 10
+
+  # Chạy migration RỒI THOÁT. Đây là job một lần, không phải service.
+  migrate:
+    build: .
+    command: npx prisma migrate deploy
+    environment:
+      # ⚠️ Trong Docker network, host là TÊN SERVICE ('postgres'),
+      # KHÔNG phải 'localhost'. localhost bên trong container
+      # là chính container đó, không phải máy thật.
+      DATABASE_URL: postgresql://shop:matkhau_hoc_tap@postgres:5432/shop_db?schema=public
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: 'no'
+
+  api:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://shop:matkhau_hoc_tap@postgres:5432/shop_db?schema=public
+      REDIS_URL: redis://redis:6379
+      PORT: 3000
+      NODE_ENV: production
+      JWT_ACCESS_SECRET: doi_o_production_access
+      JWT_REFRESH_SECRET: doi_o_production_refresh
+      LOG_LEVEL: info
+      CORS_ORIGINS: http://localhost:5173
+    ports:
+      - '3000:3000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      # service_completed_successfully: chờ migration XONG mới khởi động API.
+      # Không có dòng này, API khởi động khi bảng chưa tồn tại.
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+volumes:
+  shopdata:
+  redisdata:

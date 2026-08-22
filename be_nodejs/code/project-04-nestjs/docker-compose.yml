@@ -1,0 +1,20 @@
+# Phase 4 — Postgres riêng cho dự án NestJS (cổng 5437).
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: nest-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: shop
+      POSTGRES_PASSWORD: matkhau_hoc_tap
+      POSTGRES_DB: shop_nest
+    ports:
+      - '5437:5432'
+    volumes:
+      - nestdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U shop -d shop_nest']
+      interval: 5s
+      retries: 10
+volumes:
+  nestdata:

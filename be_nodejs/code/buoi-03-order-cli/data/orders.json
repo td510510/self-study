@@ -1,0 +1,9 @@
+[
+  { "id": "OD-001", "customer": "Mai Anh",  "status": "paid",     "total": 450000,  "items": 3, "createdAt": "2026-07-02" },
+  { "id": "OD-002", "customer": "Quốc Huy", "status": "pending",  "total": 120000,  "items": 1, "createdAt": "2026-07-02" },
+  { "id": "OD-003", "customer": "Mai Anh",  "status": "paid",     "total": 1890000, "items": 7, "createdAt": "2026-07-05" },
+  { "id": "OD-004", "customer": "Thu Hà",   "status": "cancelled","total": 300000,  "items": 2, "createdAt": "2026-07-06" },
+  { "id": "OD-005", "customer": "Quốc Huy", "status": "paid",     "total": 760000,  "items": 4, "createdAt": "2026-07-09" },
+  { "id": "OD-006", "customer": "Thu Hà",   "status": "paid",     "total": 2340000, "items": 9, "createdAt": "2026-07-11" },
+  { "id": "OD-007", "customer": "Bảo Long", "status": "pending",  "total": 95000,   "items": 1, "createdAt": "2026-07-12" }
+]

@@ -1,0 +1,20 @@
+# Buổi 15 — Postgres riêng cho bài auth (cổng 5434, tách khỏi buổi 12).
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: hocbe-rbac-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: hocbe
+      POSTGRES_PASSWORD: matkhau_hoc_tap
+      POSTGRES_DB: rbac_db
+    ports:
+      - '5435:5432'
+    volumes:
+      - rbacdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U hocbe -d rbac_db']
+      interval: 5s
+      retries: 10
+volumes:
+  rbacdata:

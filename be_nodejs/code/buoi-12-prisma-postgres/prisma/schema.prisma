@@ -1,0 +1,64 @@
+// Buổi 12 — Schema Prisma đầu tiên.
+//
+// File này là NGUỒN SỰ THẬT DUY NHẤT về cấu trúc database.
+// Sửa file này → tạo migration → database đổi theo.
+// KHÔNG BAO GIỜ sửa database bằng tay.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  // Prisma 7: chuỗi kết nối KHÔNG còn khai ở đây nữa,
+  // nó chuyển sang prisma.config.ts. Xem giáo án phần "Prisma 7 khác gì".
+}
+
+/// Người dùng
+model User {
+  id       Int    @id @default(autoincrement())
+  email    String @unique
+  ten      String
+
+  // Quan hệ 1-n: một User có nhiều Todo.
+  // Dòng này KHÔNG tạo cột nào trong bảng User —
+  // nó chỉ là "lối đi" để Prisma biết cách join.
+  todos    Todo[]
+
+  taoLuc   DateTime @default(now())
+
+  @@map("users")
+}
+
+/// Công việc cần làm
+model Todo {
+  id     Int     @id @default(autoincrement())
+  tieuDe String
+  xong   Boolean @default(false)
+  uuTien UuTien  @default(trung)
+
+  // Phía "nhiều" của quan hệ 1-n.
+  // userId là CỘT THẬT trong bảng todos (khoá ngoại).
+  // user là lối đi để Prisma join.
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// Hạn chót — thêm ở migration thứ hai để minh hoạ quy trình đổi schema
+  hanChot DateTime?
+
+  taoLuc DateTime  @default(now())
+  suaLuc DateTime? @updatedAt
+
+  // Index cho cột hay dùng để lọc.
+  // Không có index, tìm todo của một user phải quét TOÀN BỘ bảng (buổi 19).
+  @@index([userId])
+  @@index([xong])
+  @@map("todos")
+}
+
+/// Mức ưu tiên — enum thật ở tầng database, không phải chuỗi tự do
+enum UuTien {
+  thap
+  trung
+  cao
+}

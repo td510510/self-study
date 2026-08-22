@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Chạy CLI với tham số",
+      "program": "${workspaceFolder}/src/cli.js",
+      "args": ["--status=paid", "--top=2"],
+      "runtimeArgs": ["--env-file=.env"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
+}

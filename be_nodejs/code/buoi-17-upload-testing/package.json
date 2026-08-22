@@ -1,0 +1,23 @@
+{
+  "name": "upload-testing-demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --env-file=.env --test",
+    "start": "node --env-file=.env src/server.js",
+    "coverage": "node --env-file=.env --test --experimental-test-coverage"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "express": "^5.2.1",
+    "multer": "^2.2.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "supertest": "^7.2.2"
+  }
+}

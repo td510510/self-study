@@ -1,0 +1,16 @@
+{
+  "name": "todo-api",
+  "version": "1.0.0",
+  "description": "Project 1 — Todo REST API viết bằng Node thuần, không framework",
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file=.env src/server.js",
+    "dev": "node --watch --env-file=.env src/server.js",
+    "test": "node --test",
+    "test:watch": "node --test --watch"
+  },
+  "engines": {
+    "node": ">=20.6.0"
+  },
+  "license": "MIT"
+}

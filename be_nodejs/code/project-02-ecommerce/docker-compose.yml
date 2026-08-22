@@ -1,0 +1,38 @@
+# Project 2 — E-commerce mini API
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: shop-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: shop
+      POSTGRES_PASSWORD: matkhau_hoc_tap
+      POSTGRES_DB: shop_db
+    ports:
+      - '5436:5432'
+    volumes:
+      - shopdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U shop -d shop_db']
+      interval: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: shop-redis
+    restart: unless-stopped
+    ports:
+      - '6380:6379'
+    # appendonly: ghi ra đĩa để dữ liệu sống sót qua restart.
+    # Với cache thuần thì không cần, nhưng rate-limit và session thì nên có.
+    command: redis-server --appendonly yes
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      retries: 10
+
+volumes:
+  shopdata:
+  redisdata:

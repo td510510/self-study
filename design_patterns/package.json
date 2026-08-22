@@ -1,0 +1,14 @@
+{
+  "name": "design-patterns-js",
+  "version": "1.0.0",
+  "description": "Giáo trình Design Patterns bằng JavaScript thuần (Node.js, ESM)",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "demo": "node --experimental-vm-modules scripts/run.js",
+    "test": "node --test src/**/*.test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

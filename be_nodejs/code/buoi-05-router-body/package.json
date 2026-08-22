@@ -1,0 +1,16 @@
+{
+  "name": "router-body-demo",
+  "version": "1.0.0",
+  "description": "Buổi 05 — Router thủ công & parse body, không framework",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test:router": "node --test test/router.test.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20.6.0"
+  },
+  "license": "MIT"
+}

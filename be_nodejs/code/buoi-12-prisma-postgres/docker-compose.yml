@@ -1,0 +1,45 @@
+# Buổi 12 — Postgres chạy trong Docker.
+#
+# Vì sao Docker thay vì cài Postgres trực tiếp?
+#   - Cả lớp dùng CHÍNH XÁC cùng một phiên bản → không có "máy em lỗi"
+#   - Xoá sạch bằng một lệnh, không để lại rác trên máy
+#   - Chính là cách chạy ở production (buổi 27)
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: hocbe-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: hocbe
+      POSTGRES_PASSWORD: matkhau_hoc_tap
+      POSTGRES_DB: todo_db
+    ports:
+      # 5433 ở máy thật → 5432 trong container.
+      # Dùng 5433 để không đụng Postgres có sẵn trên máy học viên.
+      - '5433:5432'
+    volumes:
+      # Named volume: dữ liệu SỐNG SÓT qua `docker compose down`.
+      # Muốn xoá sạch thì `docker compose down -v`.
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # Không có healthcheck, app khởi động trước khi Postgres sẵn sàng → lỗi kết nối
+      test: ['CMD-SHELL', 'pg_isready -U hocbe -d todo_db']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Giao diện web xem database — tiện khi dạy, không bắt buộc
+  adminer:
+    image: adminer:latest
+    container_name: hocbe-adminer
+    restart: unless-stopped
+    ports:
+      # Nếu cổng 8081 cũng bị chiếm, đổi số BÊN TRÁI (máy thật) tuỳ ý
+      - '8081:8080'
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:

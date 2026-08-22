@@ -1,0 +1,16 @@
+{
+  "name": "stream-buffer-demo",
+  "version": "1.0.0",
+  "description": "Buổi 06 — Stream & Buffer",
+  "type": "module",
+  "scripts": {
+    "setup": "node 02-tao-file-lon.js",
+    "sai": "node 03-dem-dong-sai.js",
+    "dung": "node 04-dem-dong-dung.js",
+    "pipeline": "node --expose-gc 05-pipeline-transform.js"
+  },
+  "engines": {
+    "node": ">=20.6.0"
+  },
+  "license": "MIT"
+}

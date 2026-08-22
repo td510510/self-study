@@ -1,0 +1,26 @@
+# Buổi 14 — MongoDB để SO SÁNH với Postgres của buổi 12.
+#
+# Chạy song song cả hai để học viên thấy khác biệt tư duy,
+# không phải để thay thế cái nào.
+
+services:
+  mongo:
+    image: mongo:8
+    container_name: hocbe-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: hocbe
+      MONGO_INITDB_ROOT_PASSWORD: matkhau_hoc_tap
+    ports:
+      # 27018 ở máy thật để không đụng MongoDB có sẵn
+      - '27018:27017'
+    volumes:
+      - mongodata:/data/db
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mongodata:

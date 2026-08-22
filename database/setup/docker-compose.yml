@@ -1,0 +1,50 @@
+services:
+  # ---------------------------------------------------------------
+  # SQL Server 2022 (Developer Edition — miễn phí cho học tập)
+  # ---------------------------------------------------------------
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: db-lop-mssql
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Student@123"   # >= 8 ký tự, có hoa/thường/số/ký tự đặc biệt
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssqldata:/var/opt/mssql
+      - ../thuc-hanh:/thuc-hanh:ro
+
+  # ---------------------------------------------------------------
+  # MongoDB 7
+  # ---------------------------------------------------------------
+  mongo:
+    image: mongo:7
+    container_name: db-lop-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: student
+      MONGO_INITDB_ROOT_PASSWORD: student123
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+      - ../thuc-hanh:/thuc-hanh:ro
+
+  # Giao diện web cho MongoDB — dùng khi máy học viên không cài được Compass
+  mongo-express:
+    image: mongo-express:1
+    container_name: db-lop-mongo-express
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://student:student123@mongo:27017/
+      ME_CONFIG_BASICAUTH: "false"
+    ports:
+      - "8081:8081"
+
+volumes:
+  mssqldata:
+  mongodata:

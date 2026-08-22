@@ -1,0 +1,28 @@
+{
+  "name": "system-design-course",
+  "version": "1.0.0",
+  "description": "Giáo trình System Design 15 buổi cho dev JavaScript",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "check": "node labs/lab03-do-luong/01-capacity.js",
+    "lab01": "node labs/lab01-khung-thiet-ke/01-checklist.js",
+    "lab02": "node labs/lab02-http-api/server.js",
+    "lab03": "node labs/lab03-do-luong/01-capacity.js",
+    "lab04": "node labs/lab04-load-balancer/03-demo.js",
+    "lab05": "node labs/lab05-cache/01-lru.js",
+    "lab06": "node labs/lab06-index-transaction/01-index.js",
+    "lab07": "node labs/lab07-sharding-replication/01-consistent-hashing.js",
+    "lab08": "node labs/lab08-message-queue/02-demo.js",
+    "lab09": "node labs/lab09-resilience/04-demo.js",
+    "lab10": "node labs/lab10-phan-tan/02-bau-leader.js",
+    "lab11": "node labs/lab11-search/01-inverted-index.js",
+    "lab12": "node labs/lab12-observability/01-demo.js",
+    "lab13": "node labs/lab13-auth/01-jwt.js",
+    "lab14": "node labs/lab14-gateway/01-demo.js",
+    "lab15": "node labs/lab15-case-study/01-url-shortener.js"
+  }
+}
