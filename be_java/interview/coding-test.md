@@ -1,174 +1,234 @@
-# Bài test code — dạng thường gặp & chiến lược
+# Bài code phỏng vấn — dạng bài & chiến lược
 
-> Với vị trí Fresher/Junior Java Backend ở Việt Nam, bài code thường **không** phải thuật toán khó
-> kiểu LeetCode Hard. Họ kiểm tra: bạn có viết được code sạch, xử lý ca biên, và dùng đúng cấu trúc dữ liệu không.
+> Ở Việt Nam, vòng code cho Fresher/Junior Java Backend thường là: 1–2 bài thuật toán mức dễ–trung bình, hoặc một bài "viết API nhỏ", hoặc live coding trên màn hình chung.
 
-## Chiến lược làm bài (áp dụng cho mọi bài)
+---
 
-1. **Đọc kỹ và hỏi lại** (1–2 phút): đầu vào có thể null/rỗng không? Kích thước cỡ bao nhiêu? Có phân biệt hoa thường không? Kết quả mong đợi khi không tìm thấy?
-2. **Nói ra cách làm trước khi gõ** (2 phút): "Em sẽ dùng HashMap để đếm tần suất, độ phức tạp O(n)". Nếu hướng sai, người phỏng vấn sẽ chỉnh ngay — tiết kiệm 20 phút.
-3. **Viết bản chạy được trước**, tối ưu sau. Bản đúng-mà-chậm luôn hơn bản nhanh-mà-sai.
-4. **Xử lý ca biên**: null, rỗng, một phần tử, trùng lặp, số âm, tràn số.
-5. **Tự kiểm thử bằng miệng** với 2–3 bộ dữ liệu, gồm cả ca biên.
-6. **Nói về độ phức tạp** thời gian và bộ nhớ khi làm xong.
+## 1. Chiến lược làm bài (áp dụng cho mọi bài)
 
-## Nhóm 1 — Chuỗi & mảng (hay gặp nhất)
+**Bước 1 — Hỏi lại trước khi code (30 giây này ghi điểm rất cao)**
+- Đầu vào có thể null/rỗng không? Kích thước tối đa bao nhiêu?
+- Có ký tự đặc biệt, số âm, trùng lặp không?
+- Kết quả mong đợi khi không tìm thấy: trả null, ném exception, hay `Optional`?
 
-1. Đảo ngược chuỗi / kiểm tra palindrome (bỏ qua hoa thường và khoảng trắng).
-2. Đếm tần suất ký tự, tìm ký tự không lặp đầu tiên.
-3. Kiểm tra hai chuỗi là anagram.
-4. Đếm số từ, viết hoa chữ cái đầu mỗi từ.
-5. Nén chuỗi: `"aaabbc"` → `"a3b2c1"`.
-6. Tìm phần tử xuất hiện nhiều nhất / xuất hiện đúng một lần.
-7. Hai số trong mảng có tổng bằng target (Two Sum) — làm bằng `HashMap` O(n), đừng lồng 2 vòng lặp.
-8. Xoay mảng k vị trí; trộn 2 mảng đã sắp xếp.
-9. Tìm dãy con liên tiếp có tổng lớn nhất (Kadane).
-10. Kiểm tra chuỗi ngoặc hợp lệ bằng `ArrayDeque`.
+**Bước 2 — Nói ra cách làm trước khi gõ**
+> "Em sẽ dùng HashMap để đếm tần suất, độ phức tạp O(n) thời gian, O(k) bộ nhớ. Cách thay thế là sắp xếp rồi duyệt, O(n log n), chậm hơn nhưng ít tốn bộ nhớ hơn."
 
+Người phỏng vấn cần thấy bạn **cân nhắc đánh đổi**, không phải thấy bạn gõ nhanh.
+
+**Bước 3 — Code sạch**
+- Tên biến có nghĩa (`count`, `result`, không phải `a`, `tmp`)
+- Xử lý trường hợp biên **ngay từ đầu** (null, rỗng, một phần tử)
+- Tách hàm nếu quá 20 dòng
+
+**Bước 4 — Tự test bằng miệng**
+Chạy thử với: ví dụ đề bài, mảng rỗng, một phần tử, có trùng lặp, giá trị lớn.
+
+**Bước 5 — Nói về cải tiến**
+> "Nếu dữ liệu lên tới 100 triệu phần tử, em sẽ xử lý theo luồng thay vì nạp hết vào bộ nhớ."
+
+---
+
+## 2. Bài String (hay gặp nhất)
+
+**2.1 Đảo ngược chuỗi, kiểm tra palindrome**
 ```java
-// Mẫu trả lời tốt: có xử lý null, dùng đúng cấu trúc dữ liệu, nói được độ phức tạp
-public static Map<Character, Integer> demTanSuat(String s) {
-    if (s == null || s.isBlank()) return Map.of();
-    Map<Character, Integer> result = new LinkedHashMap<>();   // giữ thứ tự xuất hiện
-    for (char c : s.toLowerCase().toCharArray()) {
-        if (Character.isWhitespace(c)) continue;
-        result.merge(c, 1, Integer::sum);
+static boolean isPalindrome(String s) {
+    if (s == null) return false;
+    String clean = s.toLowerCase().replaceAll("[^a-z0-9]", "");
+    int left = 0, right = clean.length() - 1;
+    while (left < right) {
+        if (clean.charAt(left++) != clean.charAt(right--)) return false;
     }
-    return result;      // Thời gian O(n), bộ nhớ O(k) với k là số ký tự khác nhau
+    return true;
+}
+```
+*Điểm cộng*: dùng hai con trỏ thay vì `new StringBuilder(s).reverse().equals(s)` — O(1) bộ nhớ thay vì O(n).
+
+**2.2 Đếm tần suất ký tự / từ**
+```java
+Map<Character, Integer> freq = new HashMap<>();
+for (char c : s.toCharArray()) freq.merge(c, 1, Integer::sum);
+```
+
+**2.3 Kiểm tra anagram**
+```java
+static boolean isAnagram(String a, String b) {
+    if (a == null || b == null || a.length() != b.length()) return false;
+    int[] count = new int[26];
+    for (int i = 0; i < a.length(); i++) {
+        count[a.charAt(i) - 'a']++;
+        count[b.charAt(i) - 'a']--;
+    }
+    return Arrays.stream(count).allMatch(c -> c == 0);
 }
 ```
 
-## Nhóm 2 — Collections & Stream (rất hay hỏi cho Java)
-
-Cho `List<Employee>` với `(id, name, department, salary, joinDate)`:
-
-1. Nhóm nhân viên theo phòng ban.
-2. Lương trung bình mỗi phòng ban.
-3. Top 3 người lương cao nhất.
-4. Người có lương cao nhất từng phòng ban.
-5. Đếm nhân viên theo phòng ban, sắp xếp giảm dần.
-6. Tổng quỹ lương, chỉ tính người vào làm trước 2024.
-7. Chia hai nhóm: lương trên/dưới trung bình.
-8. Chuyển `List` thành `Map<id, Employee>` (nhớ xử lý trùng key!).
-9. Danh sách tên phòng ban duy nhất, sắp xếp A-Z.
-10. Sắp xếp nhiều tiêu chí: phòng ban tăng dần → lương giảm dần → tên A-Z.
-
+**2.4 Ký tự không lặp đầu tiên**
 ```java
-// Câu 4 — thường bị làm sai
-Map<String, Optional<Employee>> topByDept = employees.stream()
-        .collect(Collectors.groupingBy(Employee::department,
-                 Collectors.maxBy(Comparator.comparing(Employee::salary))));
-```
-
-## Nhóm 3 — Thiết kế class (kiểm tra tư duy OOP)
-
-1. Thiết kế `ParkingLot`: nhiều loại xe, tính phí theo giờ, tìm chỗ trống.
-2. Thiết kế `Library`: mượn/trả, hạn mức, phí trễ (chính là Dự án 1 của bạn!).
-3. Thiết kế `ShoppingCart`: thêm/xóa sản phẩm, áp dụng nhiều loại giảm giá.
-4. Thiết kế `ATM`: rút tiền, nhả tờ tiền tối ưu, kiểm tra số dư.
-5. Thiết kế `LRU Cache` dung lượng N.
-6. Thiết kế hệ thống đặt vé xem phim (chống đặt trùng ghế).
-
-Điều họ chấm: bạn có **tách trách nhiệm** hợp lý không, có dùng interface cho phần dễ thay đổi (chiến lược tính phí, phương thức thanh toán) không, có nghĩ tới đồng thời không.
-
-```java
-// Ví dụ được đánh giá cao: chiến lược giảm giá tách rời
-public interface DiscountStrategy { long apply(long amount); }
-
-public class Cart {
-    private final List<CartItem> items = new ArrayList<>();
-    private DiscountStrategy discount = amount -> amount;   // mặc định không giảm
-
-    public void setDiscount(DiscountStrategy discount) { this.discount = discount; }
-
-    public long total() {
-        long sum = items.stream().mapToLong(CartItem::lineTotal).sum();
-        return discount.apply(sum);      // thêm loại giảm giá mới = thêm 1 class, không sửa Cart
-    }
+static Character firstUnique(String s) {
+    Map<Character, Integer> freq = new LinkedHashMap<>();   // LinkedHashMap để giữ thứ tự
+    for (char c : s.toCharArray()) freq.merge(c, 1, Integer::sum);
+    return freq.entrySet().stream()
+            .filter(e -> e.getValue() == 1)
+            .map(Map.Entry::getKey)
+            .findFirst().orElse(null);
 }
 ```
 
-## Nhóm 4 — SQL (thường có 3–5 câu)
+---
 
-Cho `users(id, name, city)`, `orders(id, user_id, total, status, created_at)`:
+## 3. Bài mảng & Collections
 
-1. Top 5 khách chi nhiều nhất (không tính đơn hủy).
-2. Khách chưa từng mua hàng.
-3. Doanh thu theo tháng năm nay.
-4. Khách có từ 2 đơn trở lên.
-5. Đơn hàng gần nhất của mỗi khách (window function).
-6. Tỷ lệ hủy đơn theo tháng.
-7. Sản phẩm chưa bao giờ được bán.
-8. Xếp hạng doanh thu trong từng thành phố.
+**3.1 Two Sum** (kinh điển, phải làm được trong 5 phút)
+```java
+static int[] twoSum(int[] nums, int target) {
+    Map<Integer, Integer> seen = new HashMap<>();      // giá trị -> chỉ số
+    for (int i = 0; i < nums.length; i++) {
+        Integer j = seen.get(target - nums[i]);
+        if (j != null) return new int[]{j, i};
+        seen.put(nums[i], i);
+    }
+    return new int[]{-1, -1};
+}
+```
+Giải thích được vì sao O(n) tốt hơn hai vòng lặp lồng O(n²).
+
+**3.2 Tìm phần tử trùng lặp / số lớn thứ hai**
+```java
+static int secondLargest(int[] nums) {
+    int max = Integer.MIN_VALUE, second = Integer.MIN_VALUE;
+    for (int n : nums) {
+        if (n > max) { second = max; max = n; }
+        else if (n > second && n != max) { second = n; }
+    }
+    return second;
+}
+```
+*Điểm cộng*: một lần duyệt, không cần sắp xếp.
+
+**3.3 Nhóm dữ liệu (rất hay hỏi vì giống việc thật)**
+```java
+Map<String, List<Employee>> byDept = employees.stream()
+        .collect(Collectors.groupingBy(Employee::getDepartment));
+
+Map<String, Double> avgSalary = employees.stream()
+        .collect(Collectors.groupingBy(Employee::getDepartment,
+                 Collectors.averagingDouble(Employee::getSalary)));
+
+// Top 3 lương cao nhất
+List<Employee> top3 = employees.stream()
+        .sorted(Comparator.comparingDouble(Employee::getSalary).reversed())
+        .limit(3).toList();
+```
+
+**3.4 Kiểm tra chuỗi ngoặc hợp lệ**
+```java
+static boolean isValid(String s) {
+    Deque<Character> stack = new ArrayDeque<>();
+    Map<Character, Character> pairs = Map.of(')', '(', ']', '[', '}', '{');
+    for (char c : s.toCharArray()) {
+        if (pairs.containsValue(c)) stack.push(c);
+        else if (pairs.containsKey(c)) {
+            if (stack.isEmpty() || stack.pop() != pairs.get(c)) return false;
+        }
+    }
+    return stack.isEmpty();
+}
+```
+
+---
+
+## 4. Bài "viết API nhỏ" (dạng take-home)
+
+Đề điển hình: *"Viết REST API quản lý sản phẩm với CRUD, tìm kiếm, phân trang. Thời gian: 3–5 ngày."*
+
+Người chấm nhìn vào những gì (theo thứ tự quan trọng):
+
+| Tiêu chí | Cụ thể |
+|---|---|
+| **Cấu trúc** | phân tầng controller/service/repository, phụ thuộc một chiều |
+| **DTO** | không lộ entity ra API |
+| **Validation** | `@Valid`, thông báo lỗi rõ ràng |
+| **Xử lý lỗi** | `@RestControllerAdvice`, đúng status code |
+| **Test** | có unit test cho service, integration test cho controller |
+| **README** | cách chạy, cách test, các quyết định thiết kế |
+| **Git** | commit nhỏ, message rõ ràng, không commit `target/` hay secret |
+
+Ba thứ khiến bài bị loại ngay: (1) không có test, (2) trả entity thẳng ra API kèm cả password, (3) README trống.
+
+Mẹo: **viết một mục "Đánh đổi & những gì tôi sẽ làm nếu có thêm thời gian"** trong README. Nó cho thấy bạn biết bài của mình chưa hoàn hảo ở đâu — người chấm rất thích điều này.
+
+---
+
+## 5. Bài SQL (rất hay gặp ở ngân hàng, fintech)
+
+Cho bảng `orders(id, user_id, total, status, created_at)` và `users(id, name, city)`:
 
 ```sql
--- Câu 5 — dạng "bản ghi mới nhất của mỗi nhóm", rất hay hỏi
+-- 1. Top 5 khách chi nhiều nhất
+SELECT u.name, SUM(o.total) AS tong
+FROM users u JOIN orders o ON o.user_id = u.id
+WHERE o.status <> 'CANCELLED'
+GROUP BY u.id, u.name
+ORDER BY tong DESC LIMIT 5;
+
+-- 2. Khách CHƯA từng mua (bẫy: phải dùng LEFT JOIN hoặc NOT EXISTS)
+SELECT u.* FROM users u
+LEFT JOIN orders o ON o.user_id = u.id
+WHERE o.id IS NULL;
+
+-- 3. Doanh thu theo tháng
+SELECT TO_CHAR(created_at, 'YYYY-MM') AS thang, SUM(total)
+FROM orders WHERE status <> 'CANCELLED'
+GROUP BY 1 ORDER BY 1;
+
+-- 4. Đơn hàng mới nhất của mỗi khách (window function — câu phân loại trình độ)
 SELECT * FROM (
     SELECT o.*, ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY created_at DESC) rn
     FROM orders o
 ) t WHERE rn = 1;
+
+-- 5. Tỷ lệ hủy đơn theo tháng
+SELECT TO_CHAR(created_at, 'YYYY-MM') AS thang,
+       ROUND(100.0 * COUNT(*) FILTER (WHERE status = 'CANCELLED') / COUNT(*), 1) AS ty_le_huy
+FROM orders GROUP BY 1;
 ```
 
-## Nhóm 5 — Bài tổng hợp (bài về nhà, 2–4 tiếng)
+Hay bị hỏi thêm: *"Query này chạy chậm với 10 triệu dòng, bạn làm gì?"* → `EXPLAIN ANALYZE`, thêm index cho `user_id` và `(status, created_at)`, tránh hàm bọc quanh cột, cân nhắc bảng tổng hợp sẵn nếu là báo cáo.
 
-Đề điển hình: *"Xây REST API quản lý sản phẩm với Spring Boot, có CRUD, tìm kiếm, phân trang, validate và test."*
+---
 
-Đây là lúc **Dự án 2** của bạn phát huy tác dụng — bạn đã làm y hệt rồi. Checklist để được điểm cao:
+## 6. Bài debug / đọc code
 
-- [ ] Phân tầng rõ: controller → service → repository
-- [ ] DTO tách khỏi entity (điểm cộng lớn, nhiều ứng viên bỏ qua)
-- [ ] Validate đầy đủ + `@RestControllerAdvice` xử lý lỗi thống nhất
-- [ ] Đúng status code (201 khi tạo, 204 khi xóa, 404, 400, 409)
-- [ ] Phân trang bằng `Pageable`
-- [ ] Có test: ít nhất vài unit test service + vài test controller
-- [ ] Flyway hoặc script SQL khởi tạo, **không** dùng `ddl-auto=update`
-- [ ] README: cách chạy, danh sách API, quyết định thiết kế và lý do
-- [ ] `docker-compose.yml` để người chấm chạy bằng 1 lệnh
-- [ ] Git history sạch, commit message có nghĩa
+Dạng này ngày càng phổ biến: đưa một đoạn code có bug, hỏi bạn tìm ra.
 
-> **Mẹo ăn điểm**: viết trong README một mục *"Những gì tôi sẽ làm thêm nếu có thời gian"* — liệt kê cache, rate limit, tối ưu N+1... Nó cho thấy bạn biết giới hạn của bài làm và có tầm nhìn xa hơn yêu cầu.
+Những bug hay được cài sẵn (bạn đã học hết trong chương trình này):
+1. So sánh `String` bằng `==` thay vì `.equals()`
+2. `Integer` so sánh `==` ngoài khoảng cache -128..127
+3. `count++` không đồng bộ trong môi trường đa luồng
+4. `equals()` mà không có `hashCode()` → mất dữ liệu trong `HashSet`
+5. `double` dùng cho tiền tệ
+6. Sửa collection trong lúc for-each → `ConcurrentModificationException`
+7. Nối chuỗi trong vòng lặp lớn
+8. Quên đóng tài nguyên (không dùng try-with-resources)
+9. `catch (Exception e) {}` nuốt lỗi
+10. `@Transactional` gọi nội bộ trong cùng class (không có tác dụng)
+11. N+1 query
+12. Trả entity ra API kèm password
 
-## Nhóm 6 — Debug / đọc code (vòng phỏng vấn trực tiếp)
+---
 
-Họ đưa một đoạn code có bug và hỏi bạn thấy gì. Các bug hay được cài:
+## 7. Luyện tập
 
-```java
-// 1. So sánh String bằng ==
-if (status == "ACTIVE") { }                    // -> .equals()
+- **LeetCode Easy** (~50 bài): Array, String, HashMap là đủ cho Fresher/Junior.
+- **HackerRank SQL**: làm hết mục Basic + Intermediate.
+- **Tự đặt đồng hồ**: 20 phút/bài, ép mình nói to cách làm trong lúc code.
+- **Quan trọng nhất**: làm lại chính bài tập trong `bai-tap.md` của các module — chúng bám sát thứ được hỏi hơn nhiều bài thuật toán khó.
 
-// 2. Sửa collection khi đang duyệt
-for (String s : list) { if (...) list.remove(s); }   // -> removeIf
+## 8. Live coding — mẹo sống còn
 
-// 3. double cho tiền
-double total = price * quantity;               // -> BigDecimal
-
-// 4. Nuốt exception
-try { ... } catch (Exception e) { }            // -> log + ném tiếp
-
-// 5. Không đóng tài nguyên
-FileInputStream in = new FileInputStream(f);   // -> try-with-resources
-
-// 6. State thay đổi được trong bean singleton
-@Service class X { private int counter; }      // -> race condition
-
-// 7. N+1
-for (Order o : orders) { o.getUser().getName(); }   // -> JOIN FETCH
-
-// 8. Nối chuỗi SQL
-"SELECT * FROM users WHERE email = '" + email + "'"  // -> SQL Injection
-
-// 9. count++ trong môi trường đa luồng
-private volatile int count; count++;           // -> AtomicInteger
-
-// 10. Gọi method @Transactional trong cùng class
-public void b() { a(); }                       // -> proxy không chạy
-```
-
-Học kỹ 10 lỗi này — bạn đã gặp **tất cả** trong các module 01–14 của chương trình này.
-
-## Luyện tập ở đâu
-
-- **LeetCode Easy** (~50 bài) là đủ cho Fresher/Junior backend. Đừng sa đà vào Hard.
-- **HackerRank** phần Java + SQL — sát với bài test của các công ty Việt Nam.
-- **Codewars** để luyện viết code gọn.
-- Quan trọng nhất: **hoàn thiện 3 dự án của chương trình này**. Một dự án chạy được, có test và README tử tế có sức nặng hơn 200 bài LeetCode.
+- **Nói to suy nghĩ.** Im lặng 3 phút gõ code là điều tệ nhất; người phỏng vấn không biết bạn đang nghĩ hay đang bí.
+- **Bí thì nói ra**: "Em đang phân vân giữa dùng Map và sắp xếp, anh/chị gợi ý hướng nào phù hợp hơn không ạ?" — hỏi không bị trừ điểm, im lặng mới bị.
+- **Bắt đầu bằng lời giải chạy được, dù chưa tối ưu**, rồi cải tiến. Lời giải hoàn hảo chưa viết xong = 0 điểm.
+- Viết code như đang làm việc thật: xử lý null, đặt tên rõ ràng, không gọi biến là `x1`, `x2`.
