@@ -1,0 +1,67 @@
+# Chương trình tự học Java Backend Developer (từ 0 → đi làm)
+
+Chương trình **24 tuần** (~10–15 giờ/tuần) dành cho người mới hoàn toàn, gồm:
+- **Lý thuyết**: mỗi module một bài giảng đầy đủ, giải thích *tại sao* chứ không chỉ *làm thế nào*.
+- **Code**: ví dụ chạy được, đọc từ trên xuống là hiểu.
+- **Bài tập**: có tiêu chí "đạt" rõ ràng.
+- **3 dự án lớn**: Console app → REST API monolith → Hệ microservices có Docker/CI.
+
+## Bản đồ lộ trình
+
+| Giai đoạn | Tuần | Module | Kết quả đạt được |
+|---|---|---|---|
+| **1. Nền tảng Java** | 1 | [00-setup](00-setup/) | Cài JDK, IDE, chạy chương trình đầu tiên |
+| | 1–2 | [01-java-core](01-java-core/) | Biến, kiểu dữ liệu, điều khiển luồng, mảng, method |
+| | 3–4 | [02-oop](02-oop/) | Class, kế thừa, đa hình, interface, record, design cơ bản |
+| | 5 | [03-collections-generics](03-collections-generics/) | List/Map/Set, equals/hashCode, Generics |
+| | 6 | [04-exception-io](04-exception-io/) | Exception đúng cách, File I/O, JSON |
+| | 7 | [05-functional-stream](05-functional-stream/) | Lambda, Stream API, Optional |
+| | 8 | [06-concurrency](06-concurrency/) | Thread, ExecutorService, CompletableFuture, Virtual Threads |
+| | 9 | [07-jvm-performance](07-jvm-performance/) | Bộ nhớ JVM, GC, đọc stacktrace, tránh memory leak |
+| **2. Công cụ & dữ liệu** | 10–11 | [08-sql-jdbc](08-sql-jdbc/) | SQL, thiết kế bảng, index, transaction, JDBC |
+| | 12 | [09-maven-git-testing](09-maven-git-testing/) | Maven, Git, JUnit 5, Mockito, TDD |
+| | 12 | **Dự án 1** [p1-library-console](projects/p1-library-console/) | App quản lý thư viện thuần Java + test |
+| **3. Spring** | 13 | [10-spring-core](10-spring-core/) | IoC/DI, Bean, AOP, cấu hình |
+| | 14–15 | [11-spring-boot-rest](11-spring-boot-rest/) | REST API chuẩn, validation, xử lý lỗi, OpenAPI |
+| | 16–17 | [12-spring-data-jpa](12-spring-data-jpa/) | Entity, quan hệ, N+1, phân trang, Flyway |
+| | 18 | [13-security-jwt](13-security-jwt/) | Spring Security, JWT, phân quyền |
+| | 19 | **Dự án 2** [p2-blog-api](projects/p2-blog-api/) | REST API blog hoàn chỉnh, có test & docs |
+| **4. Production** | 20 | [14-cache-redis-messaging](14-cache-redis-messaging/) | Redis, Kafka/RabbitMQ, idempotency |
+| | 21–22 | [15-docker-microservices-cicd](15-docker-microservices-cicd/) | Docker, microservices, observability, CI/CD |
+| | 23–24 | **Dự án 3** [p3-shop-microservices](projects/p3-shop-microservices/) | Hệ e-commerce nhiều service |
+| **5. Đi làm** | song song | [interview](interview/) | Ôn phỏng vấn, CV, câu hỏi thường gặp |
+
+## Cách học hiệu quả (đọc trước khi bắt đầu)
+
+1. **Gõ lại code, đừng copy.** Bộ nhớ cơ bắp khi gõ + sửa lỗi compile là 50% giá trị bài học.
+2. **Quy tắc 70/30**: 30% thời gian đọc lý thuyết, 70% viết code. Không viết code = không học được.
+3. **Mỗi module kết thúc bằng bài tập.** Chưa làm xong bài tập thì chưa qua module.
+4. **Commit mỗi ngày.** Repo này chính là portfolio của bạn khi đi xin việc.
+5. **Bị bí quá 30 phút** mới đi tìm lời giải — nhưng phải đọc hiểu rồi tự viết lại.
+6. **Không nhảy cóc lên Spring.** 80% người học fail vì học Spring khi chưa vững OOP + Collections + SQL.
+
+## Chuẩn đầu ra (checklist đi phỏng vấn Fresher/Junior)
+
+- [ ] Giải thích được OOP, interface vs abstract class, equals/hashCode
+- [ ] Dùng thành thạo Collections + Stream API
+- [ ] Viết SQL join/group by, hiểu index và transaction/isolation level
+- [ ] Xây REST API với Spring Boot: CRUD, validate, phân trang, xử lý lỗi thống nhất
+- [ ] Dùng JPA, biết vấn đề N+1 và cách xử lý
+- [ ] Bảo mật API bằng JWT + role
+- [ ] Viết unit test + integration test (Testcontainers)
+- [ ] Đóng gói Docker, chạy docker-compose, hiểu CI/CD
+- [ ] Có 3 dự án trên GitHub kèm README tử tế
+
+## Quy ước trong repo
+
+```
+<module>/
+├── README.md      # bài giảng lý thuyết
+├── bai-tap.md     # bài tập + tiêu chí đạt
+└── src/           # code ví dụ chạy được
+```
+
+Chạy code thuần Java (JDK 21+ hỗ trợ chạy trực tiếp file .java):
+```bash
+java 01-java-core/src/HelloWorld.java
+```
