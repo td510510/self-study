@@ -1,0 +1,116 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ai-engineer-journey"
+version = "0.1.0"
+description = "Chuong trinh tu hoc 22 tuan: Zero -> AI/LLM Application Engineer"
+requires-python = ">=3.11"
+dependencies = []
+
+# ---------------------------------------------------------------------------
+# Thu vien duoc chia theo giai doan hoc de khong phai tai het ngay tuan 1.
+# Cai bang:  pip install -e ".[core]"
+# ---------------------------------------------------------------------------
+[project.optional-dependencies]
+
+# Phase 00-03 | Tuan 1-8  | ~150 MB
+core = [
+    "numpy>=2.0",
+    "pandas>=2.2",
+    "matplotlib>=3.9",
+    "seaborn>=0.13",
+    "jupyter>=1.1",
+    "ipykernel>=6.29",
+    "pytest>=8.3",
+    "python-dotenv>=1.0",
+    "rich>=13.9",
+    "requests>=2.32",
+]
+
+# Phase 04 | Tuan 9-11 | ~200 MB
+ml = [
+    "scikit-learn>=1.5",
+    "xgboost>=2.1",
+    "scipy>=1.14",
+]
+
+# Phase 05-06 | Tuan 12-15 | ~2.5 GB  (co the dung Google Colab thay the)
+dl = [
+    "torch>=2.5",
+    "torchvision>=0.20",
+    "transformers>=4.46",
+    "datasets>=3.1",
+    "tokenizers>=0.20",
+    "gradio>=5.5",
+]
+
+# Phase 07 | Tuan 16-19 | ~50 MB
+llm = [
+    "anthropic>=1.0",
+    "pydantic>=2.9",
+    "tenacity>=9.0",
+]
+# LUU Y: KHONG dung tiktoken de dem token cho Claude - do la tokenizer cua
+# OpenAI va cho con so SAI. Dung client.messages.count_tokens() cua SDK.
+
+# Phase 08 | Tuan 20-21 | ~500 MB
+rag = [
+    "chromadb>=0.5",
+    "sentence-transformers>=3.2",
+    "pypdf>=5.1",
+    "rank-bm25>=0.2",
+    "langchain-text-splitters>=0.3",
+]
+
+# Phase 10 | Tuan 22 | ~80 MB
+deploy = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "pydantic-settings>=2.6",
+    "httpx>=0.27",
+]
+
+# Tien ich cho nguoi viet bai / kiem tra chat luong code
+dev = [
+    "ruff>=0.7",
+    "pytest-cov>=6.0",
+]
+
+[tool.setuptools]
+packages = []
+
+# ---------------------------------------------------------------------------
+# pytest: chay `pytest` o thu muc goc de tu cham bai tap
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-v --tb=short --color=yes"
+markers = [
+    "phase00: bai tap Phase 00 - Setup",
+    "phase01: bai tap Phase 01 - Python nen tang",
+    "phase02: bai tap Phase 02 - Toan",
+    "phase03: bai tap Phase 03 - Data toolkit",
+    "phase04: bai tap Phase 04 - Classical ML",
+    "phase05: bai tap Phase 05 - Deep Learning",
+    "phase06: bai tap Phase 06 - NLP va Transformers",
+    "phase07: bai tap Phase 07 - LLM Engineering",
+    "phase08: bai tap Phase 08 - RAG",
+    "phase09: bai tap Phase 09 - Agents",
+    "phase10: bai tap Phase 10 - Deploy va Van hanh",
+    "slow: bai test chay lau",
+    "needs_api: bai test can ANTHROPIC_API_KEY",
+]
+
+# ---------------------------------------------------------------------------
+# ruff: format + kiem tra code sach
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501"]

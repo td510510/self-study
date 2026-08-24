@@ -1,0 +1,41 @@
+# File nao KHONG duoc di vao anh Docker.
+#
+# Day khong chi la chuyen kich thuoc. Moi file lot vao day deu nam trong anh
+# VINH VIEN va doc lai duoc bang `docker history` - ke ca khi ban xoa no o
+# lenh sau.
+
+# --- BI MAT (quan trong nhat) ---
+.env
+.env.*
+*.pem
+*.key
+secrets/
+.aws/
+.ssh/
+
+# --- Lich su Git (co the chua key da bi xoa o commit sau) ---
+.git
+.gitignore
+
+# --- Rac cua Python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# --- Du lieu va model (nang, va thuong khong nen di kem) ---
+data/
+*.pt
+*.npz
+*.ipynb_checkpoints/
+
+# --- Thu chi dung khi phat trien ---
+tests/
+notebooks/
+curriculum/
+docs/
+*.md
+!README.md

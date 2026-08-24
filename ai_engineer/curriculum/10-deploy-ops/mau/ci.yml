@@ -1,0 +1,103 @@
+# GitHub Actions CI mau cho dich vu LLM.
+# Dat file nay tai:  .github/workflows/ci.yml
+#
+# NGUYEN TAC XUYEN SUOT: CI KHONG DUOC GOI API THAT.
+#   - Cham va khong on dinh (mang, rate limit, dich vu gian doan)
+#   - Ton tien moi lan push
+#   - Can API key trong CI, tuc la them mot cho de lo key
+# Do la ly do moi bai tap tu Phase 07 den day deu nhan ham goi model lam
+# tham so: bo test cua ban chay duoc ma khong cham toi mang.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  kiem_tra:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Cai dat
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[deploy,llm,dev]"
+
+      - name: Kiem tra dinh dang va loi tinh
+        run: |
+          ruff check .
+          ruff format --check .
+
+      - name: Chay test
+        run: pytest -q
+        env:
+          # Key GIA - du de code khoi tao duoc, va bo test khong goi API that.
+          # Neu mot test nao do LO goi API that, no se that bai o day - va do
+          # chinh la dieu ban muon: CI phat hien ra, khong phai hoa don phat hien.
+          ANTHROPIC_API_KEY: sk-ant-api03-KHOA-GIA-DUNG-CHO-CI-TEST
+
+      - name: Tim bi mat bi commit nham
+        run: |
+          # Chan cac chuoi giong API key that di vao ma nguon.
+          #
+          # DANH SACH CHO PHEP la bat buoc, khong phai tuy chon: khoa hoc nay
+          # co y dung cac chuoi TRONG GIONG key that de minh hoa. Khong co
+          # allowlist thi CI do o moi lan push vi canh bao gia - va dieu xay ra
+          # tiep theo luon giong nhau: nguoi ta TAT LUON cong cu. Luc key that
+          # bi commit thi khong con ai canh nua.
+          #
+          # Moi bo do that (gitleaks, trufflehog, GitHub secret scanning) deu
+          # co co che nay vi dung ly do do.
+          CHO_PHEP='KHOA-GIA|VIDU|vidu|example|placeholder|xxx|KHONG-THAT'
+          if grep -rEn "sk-ant-api[0-9]{2}-[A-Za-z0-9_-]{20,}"                  --include="*.py" --include="*.md" --include="*.yml"                  --include="*.toml" --include="*.json" .              | grep -vE "$CHO_PHEP" ; then
+            echo "::error::Phat hien chuoi giong API key that trong ma nguon"
+            exit 1
+          fi
+          echo "Khong tim thay API key that trong ma nguon"
+          # Da lo key that? Xoa khoi code la CHUA DU - phai XOAY key o Console.
+          # Key van nam trong lich su Git, trong ban sao cua nguoi khac, va co
+          # the da bi bot quet GitHub thu thap.
+
+  dung_anh_docker:
+    runs-on: ubuntu-latest
+    needs: kiem_tra
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build anh Docker
+        run: docker build -t dich-vu-llm:${{ github.sha }} .
+
+      - name: Kiem tra anh khong chua bi mat
+        run: |
+          # `docker history` doc duoc MOI TANG, ke ca tang da bi ghi de.
+          # Day la ly do khong bao gio duoc ARG/ENV mot API key luc build.
+          if docker history --no-trunc dich-vu-llm:${{ github.sha }} \
+             | grep -qE "sk-ant-api[0-9]{2}-"; then
+            echo "::error::API key nam trong anh Docker"
+            exit 1
+          fi
+
+      - name: Kiem tra container khoi dong duoc
+        run: |
+          docker run -d --name thu \
+            -e ANTHROPIC_API_KEY=sk-ant-api03-KHOA-GIA-DUNG-CHO-CI-TEST \
+            -p 8000:8000 dich-vu-llm:${{ github.sha }}
+          # Doi container len. Vong lap co gioi han VA co dieu kien thoat -
+          # `sleep 30` co dinh vua cham hon can thiet vua khong dang tin cay hon.
+          for i in $(seq 1 20); do
+            if curl -fsS http://localhost:8000/khoe; then break; fi
+            sleep 1
+          done
+          curl -fsS http://localhost:8000/khoe
+          docker logs thu
+          docker rm -f thu

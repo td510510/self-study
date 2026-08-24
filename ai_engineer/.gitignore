@@ -1,0 +1,65 @@
+# ============================================================
+#  BI MAT - TUYET DOI KHONG COMMIT
+# ============================================================
+.env
+.env.local
+*.key
+secrets/
+
+# ============================================================
+#  Moi truong ao & Python
+# ============================================================
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ============================================================
+#  Jupyter
+# ============================================================
+.ipynb_checkpoints/
+
+# ============================================================
+#  Du lieu & model (nang, tai lai duoc)
+# ============================================================
+data/*
+!data/.gitkeep
+!data/README.md
+*.csv
+*.parquet
+*.pt
+*.pth
+*.safetensors
+*.gguf
+models/
+chroma/
+*.sqlite3
+
+# Cho phep commit dataset mau nho dung trong bai hoc
+!curriculum/**/*.csv
+!projects/**/sample_*.csv
+
+# ============================================================
+#  IDE & he dieu hanh
+# ============================================================
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# ============================================================
+#  Khac
+# ============================================================
+*.log
+.cache/
+outputs/
+_thu_nghiem/
