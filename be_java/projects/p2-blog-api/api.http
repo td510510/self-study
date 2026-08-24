@@ -1,0 +1,190 @@
+### Blog API — bộ request để gọi thử
+### Mở file này trong IntelliJ và bấm ▶ bên trái mỗi request.
+### Hoặc dùng VS Code với extension REST Client.
+
+@host = http://localhost:8080
+@api = {{host}}/api/v1
+
+### ---------------------------------------------------------- XÁC THỰC
+
+### 1. Đăng ký tài khoản mới
+# @name register
+POST {{api}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "hocvien@example.com",
+  "password": "MatKhau123",
+  "fullName": "Học Viên Java"
+}
+
+### Lưu token từ response trên
+@accessToken = {{register.response.body.accessToken}}
+@refreshToken = {{register.response.body.refreshToken}}
+
+### 2. Đăng nhập
+# @name login
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "hocvien@example.com",
+  "password": "MatKhau123"
+}
+
+### 3. Thông tin tài khoản đang đăng nhập
+GET {{api}}/auth/me
+Authorization: Bearer {{accessToken}}
+
+### 4. Làm mới access token (token cũ bị thu hồi)
+POST {{api}}/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### 5. Đổi mật khẩu
+POST {{api}}/auth/change-password
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "oldPassword": "MatKhau123",
+  "newPassword": "MatKhauMoi456"
+}
+
+### 6. Đăng xuất
+POST {{api}}/auth/logout
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### --------------------------------------------------------- BÀI VIẾT
+
+### 7. Danh sách bài viết công khai (không cần token)
+GET {{api}}/posts?page=0&size=10&sort=publishedAt,desc
+
+### 8. Tìm kiếm + lọc theo tag
+GET {{api}}/posts?keyword=java&tag=spring&page=0&size=5
+
+### 9. Chi tiết bài viết theo slug
+GET {{api}}/posts/hoc-java-tu-dau
+
+### 10. Bài viết của tôi (gồm cả bản nháp)
+GET {{api}}/posts/me
+Authorization: Bearer {{accessToken}}
+
+### 11. Tạo bài viết mới
+# @name createPost
+POST {{api}}/posts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Bài viết đầu tiên của tôi",
+  "summary": "Tóm tắt ngắn gọn về nội dung",
+  "content": "Nội dung chi tiết của bài viết, phải dài hơn 20 ký tự.",
+  "tags": ["java", "spring"]
+}
+
+@postId = {{createPost.response.body.id}}
+
+### 12. Cập nhật một phần (chỉ gửi field muốn đổi)
+PATCH {{api}}/posts/{{postId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "summary": "Tóm tắt đã được cập nhật"
+}
+
+### 13. Xuất bản
+POST {{api}}/posts/{{postId}}/publish
+Authorization: Bearer {{accessToken}}
+
+### 14. Lưu trữ
+POST {{api}}/posts/{{postId}}/archive
+Authorization: Bearer {{accessToken}}
+
+### 15. Xóa
+DELETE {{api}}/posts/{{postId}}
+Authorization: Bearer {{accessToken}}
+
+### -------------------------------------------------------- BÌNH LUẬN
+
+### 16. Danh sách bình luận của bài viết
+GET {{api}}/posts/{{postId}}/comments?page=0&size=20
+
+### 17. Thêm bình luận
+# @name createComment
+POST {{api}}/posts/{{postId}}/comments
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "content": "Bài viết rất hữu ích, cảm ơn tác giả!"
+}
+
+@commentId = {{createComment.response.body.id}}
+
+### 18. Trả lời một bình luận
+POST {{api}}/posts/{{postId}}/comments
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "content": "Cảm ơn bạn đã đọc!",
+  "parentId": {{commentId}}
+}
+
+### 19. Sửa bình luận
+PATCH {{api}}/comments/{{commentId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "content": "Nội dung bình luận đã sửa"
+}
+
+### 20. Xóa bình luận
+DELETE {{api}}/comments/{{commentId}}
+Authorization: Bearer {{accessToken}}
+
+### ------------------------------------------- KIỂM THỬ CÁC LUỒNG LỖI
+
+### 21. Không có token -> 401
+POST {{api}}/posts
+Content-Type: application/json
+
+{
+  "title": "Bài viết không có token",
+  "content": "Nội dung dài hơn hai mươi ký tự"
+}
+
+### 22. Token sai -> 401
+GET {{api}}/auth/me
+Authorization: Bearer token.gia.mao
+
+### 23. Validate hỏng -> 400 kèm fieldErrors
+POST {{api}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "khong-phai-email",
+  "password": "ngan",
+  "fullName": ""
+}
+
+### 24. Không tìm thấy -> 404
+GET {{api}}/posts/slug-khong-ton-tai
+
+### -------------------------------------------------------- VẬN HÀNH
+
+### 25. Health check
+GET {{host}}/actuator/health
+
+### 26. Swagger UI (mở trên trình duyệt)
+GET {{host}}/swagger-ui.html

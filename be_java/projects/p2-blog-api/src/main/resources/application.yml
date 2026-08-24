@@ -1,0 +1,70 @@
+spring:
+  application:
+    name: blog-api
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/blogdb}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 30000
+
+  jpa:
+    hibernate:
+      ddl-auto: validate          # schema do Flyway quản lý, KHÔNG để Hibernate tự sửa
+    open-in-view: false           # tắt: tránh giữ connection suốt request và giấu N+1
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          batch_size: 50
+        default_batch_fetch_size: 50
+        order_inserts: true
+        order_updates: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+
+server:
+  port: ${PORT:8080}
+  error:
+    include-stacktrace: never
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+
+app:
+  jwt:
+    # BẮT BUỘC đặt qua biến môi trường ở production. Giá trị dev chỉ để chạy local.
+    secret: ${JWT_SECRET:doi-chuoi-nay-thanh-bi-mat-that-dai-it-nhat-32-ky-tu}
+    access-minutes: ${JWT_ACCESS_MINUTES:15}
+    refresh-days: ${JWT_REFRESH_DAYS:7}
+  cors:
+    allowed-origins: ${CORS_ORIGINS:http://localhost:3000,http://localhost:5173}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+
+logging:
+  level:
+    com.learn.blog: DEBUG
+    org.hibernate.SQL: ${SQL_LOG:DEBUG}
