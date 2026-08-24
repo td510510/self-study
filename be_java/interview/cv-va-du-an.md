@@ -1,154 +1,210 @@
 # CV, trình bày dự án & câu hỏi hành vi
 
-## Phần 1 — CV
+> Kỹ năng kỹ thuật đưa bạn vào vòng phỏng vấn. Cách trình bày quyết định bạn có được nhận hay không.
+
+---
+
+## 1. CV cho Fresher/Junior Java Backend
 
 ### Nguyên tắc
-- **1 trang** cho Fresher/Junior. Nhà tuyển dụng đọc CV trong 15–30 giây.
-- Không ảnh, không thanh đánh giá kỹ năng kiểu "Java ▮▮▮▮▯ 80%" (vô nghĩa và dễ bị hỏi vặn).
-- Nộp file **PDF**, đặt tên `NguyenVanAn-JavaBackend.pdf`.
-- Mỗi câu bắt đầu bằng **động từ**, có **con số** nếu được.
-- Không liệt kê thứ mình không dám bị hỏi. Ghi "Kafka" thì phải trả lời được câu hỏi về Kafka.
+- **Một trang.** Người tuyển dụng đọc CV đầu tiên trong ~20 giây.
+- **Không ảnh, không thanh kỹ năng %.** "Java ▓▓▓▓░ 80%" là vô nghĩa — 80% của cái gì?
+- **Dự án quan trọng hơn học vấn** khi bạn chưa có kinh nghiệm đi làm.
+- **Nộp file PDF**, đặt tên `NguyenVanAn-JavaBackend.pdf`.
 
 ### Bố cục
-
 ```
-NGUYỄN VĂN AN
-Java Backend Developer
-📧 email · 📱 SĐT · 🔗 github.com/username · 📍 Hà Nội
+NGUYỄN VĂN AN — Java Backend Developer
+email@example.com | 09xx xxx xxx | github.com/username | Hà Nội
 
-MỤC TIÊU (2 dòng, tùy chọn — bỏ được thì bỏ)
-Tìm vị trí Java Backend Fresher để áp dụng nền tảng Java/Spring Boot
-và kinh nghiệm xây dựng REST API qua các dự án cá nhân.
+MỤC TIÊU (2 dòng, cụ thể — bỏ hẳn nếu không viết được gì cụ thể)
+Tìm vị trí Java Backend Fresher. Đã tự học 6 tháng, xây dựng 3 dự án cá nhân
+với Spring Boot, PostgreSQL, Docker; có kinh nghiệm viết test và tối ưu truy vấn.
 
 KỸ NĂNG
-Ngôn ngữ:    Java 21, SQL
-Framework:   Spring Boot, Spring Data JPA, Spring Security
-Database:    PostgreSQL, Redis
-Công cụ:     Maven, Git, Docker, JUnit 5, Mockito, Postman
-Khác:        REST API, JWT, Flyway, GitHub Actions
+Ngôn ngữ    : Java 21, SQL
+Framework   : Spring Boot 3, Spring Data JPA, Spring Security
+Database    : PostgreSQL, Redis
+Công cụ     : Maven, Git, Docker, JUnit 5, Mockito, Testcontainers
+Khác        : REST API, JWT, Kafka (cơ bản), CI/CD với GitHub Actions
 
-DỰ ÁN                                    ← PHẦN QUAN TRỌNG NHẤT VỚI FRESHER
+DỰ ÁN
+Blog REST API  ·  github.com/username/blog-api  ·  Spring Boot, PostgreSQL, JWT, Docker
+- Xây dựng REST API với xác thực JWT, phân quyền 3 vai trò, refresh token thu hồi được
+- Tối ưu truy vấn JPA: xử lý N+1 bằng JOIN FETCH và EntityGraph, giảm từ 101 xuống 2 query
+  cho endpoint danh sách
+- Viết 40+ test (unit + integration với Testcontainers), độ phủ 82% ở tầng service
+- Đóng gói Docker multi-stage (image 180MB), chạy toàn bộ bằng một lệnh docker compose up
 
-Blog REST API  |  github.com/username/blog-api  ·  Spring Boot 3, PostgreSQL, JWT, Docker
-• Xây REST API 20+ endpoint: xác thực JWT có refresh token, CRUD bài viết, bình luận lồng nhau
-• Thiết kế xử lý lỗi thống nhất bằng @RestControllerAdvice với mã lỗi và traceId để tra log
-• Xử lý vấn đề N+1: giảm từ 51 xuống 2 câu SQL cho endpoint danh sách bằng @EntityGraph
-• Viết 40+ test (JUnit 5, Mockito, Testcontainers), độ phủ 82%
-• Đóng gói Docker multi-stage (image 210MB), chạy toàn bộ bằng docker compose up
-
-Shop Microservices  |  github.com/username/shop  ·  4 service, Kafka, Redis, Gateway
-• Tách 4 service với DB riêng, giao tiếp đồng bộ (REST) và bất đồng bộ (Kafka)
-• Cài outbox pattern đảm bảo không mất sự kiện khi service dừng giữa chừng
-• Thêm circuit breaker: khi product-service ngừng chạy, order-service vẫn phản hồi < 200ms
-• Kiểm chứng không bán vượt tồn kho với 200 request đồng thời
-
-Library Management  |  github.com/username/library  ·  Java thuần, JUnit
-• Ứng dụng console phân tầng, tách interface repository nên đổi cách lưu trữ không sửa service
-• 24 test bao phủ quy tắc nghiệp vụ và các ca biên
+Shop Microservices  ·  github.com/username/shop-microservices  ·  4 service, Kafka, Redis
+- Thiết kế 4 service với database riêng, giao tiếp qua REST + Kafka
+- Cài saga cho luồng đặt hàng, có hành động bù trừ và outbox pattern đảm bảo không mất sự kiện
+- Circuit breaker (Resilience4j): khi product-service ngừng hoạt động, hệ thống vẫn phản hồi
+  trong 3 giây thay vì treo
+- Giám sát bằng Prometheus + Grafana, log JSON có trace id xuyên suốt 4 service
 
 HỌC VẤN
-Đại học X — Công nghệ thông tin — 2021–2025 — GPA 3.2/4.0
+Đại học XYZ — Công nghệ thông tin — 2022–2026 — GPA 3.2/4.0
 
-CHỨNG CHỈ / KHÁC (nếu có)
-TOEIC 750 · Oracle Certified Associate Java SE
+CHỨNG CHỈ / KHÁC
+TOEIC 700 · Đọc hiểu tài liệu kỹ thuật tiếng Anh tốt
 ```
 
-### So sánh cách viết
+### Cách viết mô tả dự án cho đúng
 
-| ❌ Yếu | ✅ Mạnh |
+❌ **Sai** (kể công nghệ, ai cũng viết được):
+> "Sử dụng Spring Boot, JPA, MySQL để làm website bán hàng có chức năng đăng nhập, đăng ký, giỏ hàng."
+
+✅ **Đúng** (nêu **vấn đề đã giải quyết** và **số liệu**):
+> "Tối ưu endpoint danh sách sản phẩm: phát hiện N+1 qua log SQL, xử lý bằng EntityGraph, giảm từ 101 xuống 2 query và thời gian phản hồi từ 1,8s xuống 90ms."
+
+Công thức: **Làm gì → Gặp vấn đề gì → Xử lý thế nào → Kết quả đo được**.
+
+Không có số liệu thật thì đi đo — chương trình này đã dạy bạn cách đo (Module 07, 12, 14).
+
+### Những lỗi khiến CV bị loại
+- Liệt kê 30 công nghệ trong đó có 25 cái chỉ "nghe qua" → bị hỏi vào là lộ ngay.
+- Link GitHub trống hoặc chỉ có bài tập nhỏ.
+- Sai chính tả tên công nghệ: "Springboot", "PostgreSql", "Java Sprint".
+- Nói dối kinh nghiệm — vòng kỹ thuật phát hiện trong 5 phút.
+
+---
+
+## 2. Repo GitHub — thứ được xem kỹ nhất
+
+Nhà tuyển dụng mở repo và nhìn theo đúng thứ tự này:
+
+1. **README** — 30 giây đầu quyết định họ có đọc tiếp không.
+2. **Cấu trúc thư mục** — có phân tầng không, hay tất cả nhét trong một package?
+3. **Có test không** — thư mục `src/test` trống là điểm trừ rất nặng.
+4. **Lịch sử commit** — commit đều đặn, message rõ ràng; hay là một commit "init project" duy nhất 5000 dòng?
+5. **Có secret bị commit không** — thấy mật khẩu trong `application.yml` là loại thẳng.
+
+README tối thiểu phải có:
+```markdown
+# Tên dự án
+Một câu mô tả nó làm gì.
+
+## Công nghệ
+Liệt kê + lý do chọn
+
+## Chạy thử
+```bash
+docker compose up
+```
+(phải chạy được thật — người ta sẽ thử)
+
+## Tính năng
+## Kiến trúc (kèm sơ đồ)
+## Những quyết định kỹ thuật đáng chú ý  ← phần ăn điểm nhất
+## Những gì sẽ làm tiếp nếu có thêm thời gian
+```
+
+Ba dự án trong chương trình này đều đã có README mẫu — hãy viết lại bằng lời của bạn, đừng copy.
+
+---
+
+## 3. Trình bày dự án khi phỏng vấn
+
+Bạn sẽ được hỏi: *"Kể về một dự án em tâm đắc nhất."* Đây là câu **quyết định kết quả** buổi phỏng vấn.
+
+Cấu trúc trả lời trong 3 phút:
+
+**(1) Bối cảnh — 20 giây**
+> "Em xây dựng một REST API blog để tự học Spring Boot. Nó có xác thực JWT, phân quyền, quản lý bài viết và bình luận."
+
+**(2) Vai trò và công nghệ — 20 giây**
+> "Em làm toàn bộ: thiết kế database, viết API, viết test, đóng gói Docker. Dùng Spring Boot 3, PostgreSQL, Redis."
+
+**(3) Một vấn đề khó và cách giải quyết — 90 giây (phần quan trọng nhất)**
+> "Endpoint danh sách bài viết ban đầu mất gần 2 giây. Em bật `show-sql` và phát hiện nó chạy 101 câu query cho 50 bài — kinh điển là N+1: mỗi bài lại query thêm để lấy tác giả. Em thử `JOIN FETCH` nhưng gặp cảnh báo `HHH90003004` vì kết hợp với phân trang sẽ khiến Hibernate phân trang trong bộ nhớ. Cuối cùng em dùng `@EntityGraph` cho quan hệ ManyToOne, còn phần bình luận thì nạp riêng bằng một query theo danh sách id. Kết quả: 2 query, thời gian phản hồi còn 90ms. Sau đó em viết thêm một test đếm số query để chặn hồi quy."
+
+**(4) Điều rút ra — 30 giây**
+> "Em học được là ORM tiện nhưng phải luôn nhìn SQL nó sinh ra. Từ đó em có thói quen bật log SQL trong lúc dev cho mọi endpoint mới."
+
+Vì sao cách này hiệu quả: nó chứng minh bạn **biết chẩn đoán**, không chỉ biết gõ theo hướng dẫn.
+
+### Chuẩn bị sẵn 3 câu chuyện
+1. Một bài toán **kỹ thuật** khó (như trên).
+2. Một lần bạn **sửa lỗi khó tìm** (bug đa luồng, memory leak, dữ liệu sai lúc tải cao).
+3. Một lần bạn **cân nhắc đánh đổi** và chọn phương án đơn giản hơn (ví dụ: không tách microservices).
+
+---
+
+## 4. Câu hỏi hành vi thường gặp
+
+**"Giới thiệu bản thân"** — 90 giây, theo trình tự: bạn là ai → học/làm gì → vì sao chọn backend → điều bạn đang muốn làm tiếp. Đừng đọc lại CV.
+
+**"Vì sao chọn Java mà không phải ngôn ngữ khác?"**
+Trả lời thật: kiểu tĩnh giúp bắt lỗi sớm khi dự án lớn, hệ sinh thái Spring trưởng thành, thị trường việc làm ở Việt Nam rộng (ngân hàng, fintech, outsourcing).
+
+**"Điểm yếu của em là gì?"**
+Nói một điểm yếu **thật** kèm cách đang khắc phục. Ví dụ: *"Em chưa có kinh nghiệm vận hành hệ thống thật ở quy mô lớn. Em bù bằng cách tự dựng Prometheus/Grafana cho dự án cá nhân và tập chẩn đoán sự cố."* Tránh câu sáo rỗng "em quá cầu toàn".
+
+**"Em học công nghệ mới bằng cách nào?"**
+Kể quy trình thật: đọc tài liệu chính thức → làm một dự án nhỏ → viết lại những gì hiểu. Dẫn chứng bằng chính repo học tập của bạn.
+
+**"Bất đồng với đồng nghiệp/leader thì em xử lý sao?"**
+Nêu quy trình: trình bày quan điểm kèm dữ liệu → lắng nghe lý do bên kia → nếu vẫn khác nhau thì theo quyết định của người chịu trách nhiệm và làm hết mình. Điều họ muốn nghe: bạn tranh luận dựa trên **dữ liệu**, không dựa trên cái tôi.
+
+**"Em có câu hỏi gì cho công ty không?"**
+**Luôn phải có câu hỏi.** Không hỏi gì = tín hiệu bạn không thật sự quan tâm. Vài câu tốt:
+- Quy trình review code và deploy của team hiện tại như thế nào?
+- Team đang dùng Java phiên bản nào, có kế hoạch nâng cấp không?
+- Người mới vào sẽ được onboard ra sao trong 1–3 tháng đầu?
+- Phần nào của hệ thống hiện đang gây khó khăn nhất cho team?
+- Anh/chị đánh giá em còn thiếu gì cho vị trí này? *(Câu này vừa cho bạn phản hồi thật, vừa thể hiện cầu thị.)*
+
+---
+
+## 5. Đàm phán lương (tham khảo)
+
+Mức tham khảo cho Java Backend tại Việt Nam (2026, thay đổi theo công ty và địa điểm):
+
+| Cấp bậc | Khoảng phổ biến |
 |---|---|
-| "Có kiến thức về Spring Boot" | "Xây REST API 20+ endpoint với Spring Boot 3, có JWT và phân trang" |
-| "Làm việc nhóm tốt" | "Phối hợp 3 thành viên qua Git flow, review code lẫn nhau" |
-| "Sử dụng database" | "Thiết kế schema 8 bảng, tối ưu query từ 2.1s xuống 80ms bằng index tổ hợp" |
-| "Biết Docker" | "Đóng gói multi-stage build, giảm image từ 780MB xuống 210MB" |
+| Fresher (0–1 năm) | 8–15 triệu |
+| Junior (1–2 năm) | 15–25 triệu |
+| Middle (2–5 năm) | 25–45 triệu |
+| Senior (5+ năm) | 45–80 triệu+ |
 
-### GitHub — nhà tuyển dụng **sẽ** mở ra xem
-- README mỗi dự án phải có: mô tả, công nghệ, **ảnh chụp màn hình hoặc sơ đồ**, cách chạy, danh sách API.
-- Code phải **chạy được** khi clone về. Không commit file `target/`, `.env`, mật khẩu.
-- Commit message có nghĩa (`feat: thêm API hủy đơn`), không phải `update`, `fix bug`, `asdasd`.
-- Ghim (pin) 3 dự án tốt nhất lên đầu trang cá nhân.
+Nguyên tắc:
+- **Khảo sát trước** trên ITviec, TopDev, VietnamWorks cho đúng vị trí và địa điểm.
+- Khi được hỏi mong muốn, đưa **khoảng** dựa trên khảo sát: *"Em mong muốn trong khoảng 12–15 triệu, tùy vào phạm vi công việc cụ thể."*
+- Fresher: **ưu tiên môi trường học được** hơn 1–2 triệu chênh lệch. Một năm ở team có code review tử tế đáng giá hơn nhiều so với hai năm làm một mình.
+- Hỏi rõ tổng thu nhập: lương cứng, thưởng, tháng 13, bảo hiểm đóng trên mức nào, chính sách OT, remote/hybrid.
+- Nhận offer thì xin **văn bản** trước khi nghỉ chỗ cũ.
 
-## Phần 2 — Trình bày dự án (bị hỏi ở mọi buổi phỏng vấn)
+---
 
-Dùng cấu trúc **4 phần, 2 phút**:
+## 6. Checklist trước ngày phỏng vấn
 
-```
-1. BÀI TOÁN   — dự án làm gì, cho ai (20 giây)
-2. GIẢI PHÁP  — kiến trúc, công nghệ và VÌ SAO chọn (40 giây)
-3. KHÓ KHĂN   — một vấn đề cụ thể và cách bạn giải quyết (40 giây)  ← quan trọng nhất
-4. KẾT QUẢ    — con số, bài học rút ra (20 giây)
-```
+**Một tuần trước**
+- [ ] Đọc kỹ mô tả công việc, gạch chân công nghệ họ dùng và ôn đúng những cái đó
+- [ ] Tìm hiểu công ty: sản phẩm gì, khách hàng ai, quy mô team
+- [ ] Ôn lại `cau-hoi-java-core.md` và `cau-hoi-spring-database.md`
+- [ ] Chuẩn bị 3 câu chuyện dự án (mục 3)
 
-Ví dụ mẫu:
+**Một ngày trước**
+- [ ] Đọc lại **chính code dự án của mình** — bị hỏi "dòng này để làm gì" mà ấp úng là mất điểm nặng
+- [ ] Kiểm tra repo GitHub chạy được, README ổn
+- [ ] Chuẩn bị 3–5 câu hỏi cho nhà tuyển dụng
+- [ ] Test camera, mic, đường truyền nếu phỏng vấn online
 
-> "Em xây một REST API cho blog: người dùng đăng ký, viết bài, bình luận.
-> Em dùng Spring Boot 3 với PostgreSQL, xác thực bằng JWT — chọn JWT vì API stateless
-> nên scale nhiều instance không cần session dùng chung.
->
-> Khó khăn lớn nhất là hiệu năng: endpoint danh sách bài viết ban đầu mất 1.8 giây.
-> Em bật `show-sql` và phát hiện nó sinh 51 câu SQL cho 50 bài — đúng vấn đề N+1,
-> vì mỗi bài lại truy vấn thêm tác giả. Em thử `JOIN FETCH` nhưng gặp cảnh báo Hibernate
-> phân trang trong bộ nhớ, nên chuyển sang `@EntityGraph`, còn 2 query, thời gian xuống 80ms.
->
-> Ngoài ra em viết 40 test, phần tích hợp dùng Testcontainers với PostgreSQL thật vì H2
-> hành xử khác Postgres. Bài học lớn nhất là phải **đo trước khi tối ưu** — ban đầu em
-> tưởng cần thêm cache, hóa ra chỉ cần sửa cách nạp dữ liệu."
+**Trong buổi phỏng vấn**
+- [ ] Không biết thì nói không biết, kèm cách bạn sẽ tìm hiểu
+- [ ] Trả lời bằng **ví dụ cụ thể từ dự án**, không nói lý thuyết chung chung
+- [ ] Ghi chép lại các câu bạn trả lời chưa tốt
 
-Vì sao câu trả lời này tốt: có con số cụ thể, kể được **quá trình chẩn đoán** (không phải chỉ kết quả), nêu được cả phương án đã thử mà không dùng, và kết bằng bài học.
+**Sau buổi phỏng vấn**
+- [ ] Viết lại toàn bộ câu hỏi được hỏi vào một file — đây là tài sản cho những lần sau
+- [ ] Tra cứu và học kỹ những câu bạn trả lời sai
+- [ ] Bị từ chối thì hỏi xin phản hồi. Nhiều người sẵn sàng trả lời, và đó là thông tin quý nhất bạn nhận được.
 
-### Những câu hỏi đào sâu chắc chắn sẽ tới
-- "Vì sao chọn JWT mà không dùng session?" → nói cả nhược điểm của JWT.
-- "Nếu bây giờ có 1 triệu người dùng thì hệ thống hỏng ở đâu trước?" → thành thật: có thể là DB, cần đọc từ replica, cache, phân trang keyset.
-- "Em test những gì?" → không nói "test hết", hãy nói test **logic nghiệp vụ và ca biên**.
-- "Nếu làm lại em sẽ làm khác gì?" → chuẩn bị sẵn 2 điều, ví dụ: tách DTO sớm hơn, viết test trước.
+---
 
-## Phần 3 — Câu hỏi hành vi
+## 7. Lời cuối
 
-Dùng cấu trúc **STAR**: Situation → Task → Action → Result.
+Bị từ chối vài lần là chuyện bình thường, kể cả người giỏi. Mỗi buổi phỏng vấn cho bạn một danh sách chính xác những gì cần học tiếp — thứ mà không khóa học nào cung cấp được.
 
-**1. Điểm mạnh / điểm yếu của bạn?**
-Điểm yếu phải **thật** và kèm cách bạn đang khắc phục: "Em hay sa đà tối ưu quá sớm. Sau khi học về đo hiệu năng, giờ em bắt buộc mình phải đo trước rồi mới sửa."
-
-**2. Bạn xử lý thế nào khi bí một vấn đề?**
-"Em dành 30 phút tự tìm: đọc lỗi, thu nhỏ phạm vi bằng cách tách đoạn code nghi ngờ, đọc tài liệu chính thức. Quá 30 phút mà không tiến triển thì em hỏi, nhưng hỏi kèm những gì đã thử để người khác không mất công lặp lại."
-
-**3. Bạn học công nghệ mới như thế nào?**
-Kể một ví dụ thật từ chương trình học này: "Em học Kafka bằng cách dựng docker-compose, viết producer/consumer đơn giản, rồi cố tình gửi lặp sự kiện để hiểu vì sao cần idempotency."
-
-**4. Bạn từng mắc lỗi nào lớn chưa?**
-Có, kể một lỗi thật và bài học. Trả lời "em chưa mắc lỗi bao giờ" là mất điểm nặng.
-
-**5. Vì sao chọn Java backend?**
-Trả lời cụ thể, tránh sáo rỗng: "Em thích phần logic và dữ liệu hơn giao diện. Java có kiểu tĩnh nên lỗi bị bắt sớm, và hệ sinh thái Spring rất trưởng thành cho hệ thống lớn."
-
-**6. Bạn mong đợi gì ở công việc đầu tiên?**
-"Được review code kỹ và học từ người có kinh nghiệm. Em muốn hiểu vì sao code được viết như vậy, chứ không chỉ hoàn thành task."
-
-**7. Bạn có câu hỏi gì cho chúng tôi không?** (Luôn phải có)
-- Quy trình làm việc của team thế nào? Có code review không?
-- Hệ thống hiện tại đang gặp thách thức kỹ thuật gì lớn nhất?
-- Người mới vào được onboard ra sao trong 1–2 tháng đầu?
-- Team có viết test tự động và CI/CD chưa?
-
-## Phần 4 — Lương và thương lượng
-
-**Khi được hỏi "Em mong muốn mức lương bao nhiêu?"**
-
-Đừng nói "tùy công ty" — nó cho thấy bạn chưa tìm hiểu. Hãy đưa **một khoảng**:
-> "Em tìm hiểu thì vị trí Fresher Java Backend ở Hà Nội thường trong khoảng X–Y triệu.
-> Em mong muốn trong khoảng đó, nhưng em ưu tiên môi trường được học và được review code kỹ."
-
-Cách chuẩn bị:
-1. Tra khảo sát lương (ITviec, TopDev, VietnamWorks) theo đúng vị trí, cấp bậc, thành phố.
-2. Hỏi bạn bè cùng ngành để có số thực tế.
-3. Đưa khoảng, không đưa một con số cứng.
-4. Hỏi rõ: lương **gross hay net**, thưởng tháng 13, đánh giá tăng lương bao lâu một lần.
-
-**Với Fresher, thứ đáng đàm phán hơn tiền**: được mentor, được review code, có cơ hội chạm vào production. Chênh lệch 2 triệu ở công việc đầu tiên không quan trọng bằng việc bạn tiến bộ nhanh gấp đôi.
-
-## Phần 5 — Sau buổi phỏng vấn
-
-- Gửi email cảm ơn trong 24 giờ (ngắn 3–4 dòng, nhắc một điểm cụ thể đã trao đổi).
-- **Ghi lại ngay** những câu bạn trả lời chưa tốt, về nhà tìm hiểu kỹ. Câu đó sẽ xuất hiện lại ở buổi phỏng vấn sau.
-- Bị từ chối thì lịch sự hỏi lý do để cải thiện. Nhiều nơi sẽ trả lời thật.
-- **Trượt vài lần là bình thường.** Mỗi lần phỏng vấn là một buổi học miễn phí về đúng thứ thị trường đang cần.
+Cứ tiếp tục: học → làm dự án → phỏng vấn → sửa lỗ hổng → lặp lại. Chúc bạn sớm nhận được offer đầu tiên.
