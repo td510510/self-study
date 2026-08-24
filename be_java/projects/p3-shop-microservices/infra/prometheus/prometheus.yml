@@ -1,0 +1,15 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'shop-services'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets:
+          - 'api-gateway:8080'
+          - 'auth-service:8081'
+          - 'product-service:8082'
+          - 'order-service:8083'
+          - 'notification-service:8084'
+        labels:
+          env: 'local'
