@@ -85,7 +85,7 @@ Phím tắt phải thuộc lòng ngay tuần đầu:
 
 ### 3.3 Công cụ khác (cài dần theo module)
 - **Git** — https://git-scm.com (module 09)
-- **Maven** — module 09 (hoặc dùng Maven Wrapper `./mvnw`, không cần cài)
+- **Maven** — module 09. Nên cài thật: `winget install Apache.Maven` (Windows). Project sinh từ start.spring.io có kèm `./mvnw` nên không bắt buộc, nhưng các dự án trong repo này thì cần `mvn`.
 - **PostgreSQL + DBeaver** — module 08
 - **Docker Desktop** — module 15
 - **Postman** hoặc `curl` — module 11

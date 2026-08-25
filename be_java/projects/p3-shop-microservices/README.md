@@ -1,6 +1,7 @@
 # Dự án 3 — Shop Microservices
 
-> Làm sau Module 15. Dự án cuối: hệ thống thương mại điện tử rút gọn gồm 4 service, chạy toàn bộ bằng `docker compose up`.
+> Làm sau Module 15. Dự án cuối: hệ thống thương mại điện tử rút gọn gồm 4 service + gateway.
+> Thư mục này cung cấp **kiến trúc, hợp đồng API, hạ tầng và checklist** — mã nguồn service là phần bạn tự viết.
 
 Đây là dự án để **học các vấn đề của hệ phân tán**, không phải để chứng minh microservices tốt hơn monolith. Trong lúc làm, hãy liên tục tự hỏi: *"Nếu để nguyên monolith thì việc này đơn giản hơn bao nhiêu?"* — trả lời được câu đó chính là thứ nhà tuyển dụng muốn nghe.
 
@@ -108,9 +109,20 @@ So sánh thẳng thắn: trong monolith, toàn bộ luồng này là **một tra
 
 ## Chạy hệ thống
 
+> ⚠ **Đọc trước**: 5 thư mục service hiện chỉ có `Dockerfile` + đặc tả, **chưa có mã nguồn** —
+> phần đó là bài tập của bạn (xem mục "Ghi chú về mã nguồn" ở cuối). Vì vậy `docker compose up`
+> đầy đủ sẽ **chưa chạy được** cho tới khi bạn viết xong ít nhất một service.
+
+**Bước 1 — chạy riêng hạ tầng** (làm được ngay từ hôm nay):
 ```bash
 cd projects/p3-shop-microservices
 cp .env.example .env
+docker compose up -d postgres redis kafka prometheus grafana
+docker compose ps                  # kiểm tra 5 container đều healthy
+```
+
+**Bước 2 — sau khi đã viết service**, chạy toàn bộ:
+```bash
 docker compose up --build          # lần đầu mất vài phút
 ```
 

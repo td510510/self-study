@@ -31,16 +31,25 @@ docker compose up --build
 ```bash
 docker compose up -d db
 export JWT_SECRET="chuoi-bi-mat-that-dai-it-nhat-32-ky-tu"
-./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
 **Chạy test**:
 ```bash
-./mvnw test                    # cần Docker đang chạy cho test tích hợp
-./mvnw test -Dtest=PostServiceTest    # chỉ unit test, không cần Docker
+mvn test                       # cần Docker đang chạy cho test tích hợp
+mvn test -Dtest=PostServiceTest       # chỉ unit test, không cần Docker
 ```
 
-> Chưa có Maven? Dùng `./mvnw` (Maven Wrapper) hoặc mở project bằng IntelliJ.
+> **Chưa có Maven?** Dự án này chưa kèm sẵn Maven Wrapper (`mvnw`). Chọn một trong ba cách:
+> 1. Cài Maven: `winget install Apache.Maven` (Windows) hoặc tải tại https://maven.apache.org/download.cgi
+> 2. Mở thư mục này bằng **IntelliJ IDEA** — IDE có sẵn Maven, bấm ▶ là chạy.
+> 3. Sinh wrapper một lần rồi commit vào repo (sau khi đã có Maven): `mvn wrapper:wrapper`
+>    — từ đó về sau cả team dùng `./mvnw` mà không cần cài gì.
+
+> ⚠ **Lưu ý trung thực về mã nguồn**: toàn bộ code ở đây được viết theo chuẩn Spring Boot 3.3
+> nhưng **chưa từng được biên dịch/chạy** (lúc tạo dự án máy chưa cài Maven).
+> Lần `mvn test` đầu tiên có thể phát sinh vài lỗi nhỏ (thiếu import, lệch version thư viện).
+> Hãy coi đó là bài tập đầu tiên: đọc thông báo lỗi và tự sửa — đúng như công việc thật.
 
 ## Kiến trúc
 
