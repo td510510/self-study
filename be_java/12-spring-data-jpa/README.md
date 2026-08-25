@@ -335,5 +335,18 @@ class BookRepositoryTest {
 - Flyway cho schema; `ddl-auto=validate` ở production.
 - Test bằng Testcontainers với DB thật.
 
+
+## 💻 Code ví dụ chạy được
+
+Module này có code chạy thật trong [../spring-playground/](../spring-playground/) — package `m12jpa`:
+
+```bash
+cd spring-playground && mvn spring-boot:run     # rồi mở http://localhost:8080/
+```
+Nội dung: ĐẾM SỐ CÂU SQL cho N+1, dirty checking, rollback, tồn kho an toàn.
+Endpoint: `/m12/n-plus-1/bad, /m12/n-plus-1/good, /m12/dirty-checking, /m12/rollback, /m12/atomic-stock`.
+
+> Vừa gọi API vừa **đọc console** — một nửa bài học nằm ở log SQL và log aspect.
+
 ## Bài tập
 👉 [bai-tap.md](bai-tap.md), sau đó sang [Module 13 — Security & JWT](../13-security-jwt/).

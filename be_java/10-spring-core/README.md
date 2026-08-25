@@ -314,5 +314,18 @@ Ba dòng thay cho toàn bộ cấu hình servlet, JSON converter, HTTP server �
 - Cấu hình bằng `@ConfigurationProperties` + profile; secret nằm ở biến môi trường.
 - AOP dùng proxy → gọi method nội bộ thì annotation vô hiệu.
 
+
+## 💻 Code ví dụ chạy được
+
+Module này có code chạy thật trong [../spring-playground/](../spring-playground/) — package `m10core`:
+
+```bash
+cd spring-playground && mvn spring-boot:run     # rồi mở http://localhost:8080/
+```
+Nội dung: DI, @Qualifier, Map strategy, bean singleton có state, @ConfigurationProperties, AOP, bẫy proxy.
+Endpoint: `/m10/di, /m10/strategy, /m10/singleton-bug, /m10/config, /m10/aop, /m10/self-invocation`.
+
+> Vừa gọi API vừa **đọc console** — một nửa bài học nằm ở log SQL và log aspect.
+
 ## Bài tập
 👉 [bai-tap.md](bai-tap.md), sau đó sang [Module 11 — Spring Boot REST API](../11-spring-boot-rest/).

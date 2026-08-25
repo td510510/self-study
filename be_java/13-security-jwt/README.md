@@ -333,5 +333,18 @@ class SecurityIT {
 - Mặc định cấm, chỉ mở endpoint công khai; `@PreAuthorize` cho quyền chi tiết.
 - Luôn kiểm tra quyền sở hữu bản ghi (chống IDOR).
 
+
+## 💻 Code ví dụ chạy được
+
+Module này có code chạy thật trong [../spring-playground/](../spring-playground/) — package `m13security`:
+
+```bash
+cd spring-playground && mvn spring-boot:run     # rồi mở http://localhost:8080/
+```
+Nội dung: JWT, 401 vs 403, @PreAuthorize, giải mã payload, chống IDOR.
+Endpoint: `/m13/login, /m13/me, /m13/admin, /m13/orders/{id}, /m13/decode`.
+
+> Vừa gọi API vừa **đọc console** — một nửa bài học nằm ở log SQL và log aspect.
+
 ## Bài tập
 👉 [bai-tap.md](bai-tap.md), sau đó bắt tay vào **[Dự án 2 — Blog REST API](../projects/p2-blog-api/)**.

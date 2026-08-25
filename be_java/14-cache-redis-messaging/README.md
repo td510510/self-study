@@ -304,5 +304,18 @@ public void guiOutbox() { ... }
 - **Idempotency + DLQ + Outbox** là ba thứ bắt buộc trong hệ thống thật.
 - Trong một ứng dụng: `@TransactionalEventListener(AFTER_COMMIT)` + `@Async`.
 
+
+## 💻 Code ví dụ chạy được
+
+Module này có code chạy thật trong [../spring-playground/](../spring-playground/) — package `m14cache`:
+
+```bash
+cd spring-playground && mvn spring-boot:run     # rồi mở http://localhost:8080/
+```
+Nội dung: @Cacheable hit/miss, evict, bẫy proxy, cache stampede, sự kiện sau commit.
+Endpoint: `/m14/cache/{id}, /m14/stampede, /m14/event`.
+
+> Vừa gọi API vừa **đọc console** — một nửa bài học nằm ở log SQL và log aspect.
+
 ## Bài tập
 👉 [bai-tap.md](bai-tap.md), sau đó sang [Module 15 — Docker, Microservices & CI/CD](../15-docker-microservices-cicd/).

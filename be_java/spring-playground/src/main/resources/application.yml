@@ -1,0 +1,70 @@
+spring:
+  application:
+    name: spring-playground
+
+  # H2 in-memory: chạy được ngay, không cần cài gì.
+  # ⚠ Dự án thật phải test trên PostgreSQL/Testcontainers — H2 hành xử khác Postgres
+  #   ở nhiều chỗ (TIMESTAMPTZ, ILIKE, RETURNING...) và sẽ giấu bug.
+  datasource:
+    url: jdbc:h2:mem:playground;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  h2:
+    console:
+      enabled: true          # http://localhost:8080/h2-console
+      path: /h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop   # CHỈ hợp cho sân tập. Production: validate + Flyway (Module 12).
+    open-in-view: false       # tắt để lỗi lazy loading lộ ra ngay lúc dev
+    properties:
+      hibernate:
+        format_sql: true
+        generate_statistics: true    # bật để đếm số câu SQL trong /m12/n-plus-1/*
+    show-sql: true                   # NHÌN SQL LÀ CÁCH HỌC JPA NHANH NHẤT
+
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+
+  task:
+    execution:
+      pool:
+        core-size: 4
+        max-size: 8
+      thread-name-prefix: async-
+
+server:
+  port: 8080
+  shutdown: graceful
+  error:
+    include-stacktrace: never
+
+# Module 10 — @ConfigurationProperties đọc phần này (có validate)
+app:
+  shop:
+    name: Cửa hàng Sân Tập
+    max-items-per-order: 10
+    free-shipping-threshold: 500000
+  jwt:
+    # Chỉ dùng cho sân tập. Production: đọc từ biến môi trường, không nằm trong file.
+    secret: ${JWT_SECRET:day-la-chuoi-bi-mat-cho-san-tap-dai-hon-32-ky-tu}
+    access-minutes: 30
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+logging:
+  level:
+    com.learn.playground: DEBUG
+    org.hibernate.SQL: DEBUG
+    # Bỏ comment dòng dưới để thấy cả GIÁ TRỊ THAM SỐ trong câu SQL
+    # org.hibernate.orm.jdbc.bind: TRACE
+    org.springframework.transaction: INFO

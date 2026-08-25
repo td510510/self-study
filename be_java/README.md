@@ -31,6 +31,19 @@ Chương trình **24 tuần** (~10–15 giờ/tuần) dành cho người mới h
 | | 23–24 | **Dự án 3** [p3-shop-microservices](projects/p3-shop-microservices/) | Hệ e-commerce nhiều service |
 | **5. Đi làm** | song song | [interview](interview/) | Ôn phỏng vấn, CV, câu hỏi thường gặp |
 
+## Code ví dụ chạy được
+
+| Phần | Chạy thế nào |
+|---|---|
+| Module 00–08 | `java 01-java-core/src/Basics.java` — chạy trực tiếp, không cần cài gì thêm |
+| Module 09 | [09-maven-git-testing/demo-project](09-maven-git-testing/demo-project/) — `mvn test` |
+| **Module 10–14** | [spring-playground](spring-playground/) — `mvn spring-boot:run` rồi mở http://localhost:8080/ |
+| Module 15 | thực hành trực tiếp với Docker/CI trên 2 dự án |
+
+`spring-playground` là một app Spring Boot chia package theo module, mỗi endpoint chứng minh **một**
+bài học bằng số liệu: đếm SQL để thấy N+1, 100 thread cùng mua hàng, 401 vs 403, cache hit/miss,
+và các bẫy proxy khiến `@Transactional`/`@Cacheable` im lặng vô hiệu.
+
 ## Cách học hiệu quả (đọc trước khi bắt đầu)
 
 1. **Gõ lại code, đừng copy.** Bộ nhớ cơ bắp khi gõ + sửa lỗi compile là 50% giá trị bài học.

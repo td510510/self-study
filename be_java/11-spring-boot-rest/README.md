@@ -412,5 +412,18 @@ Ghi log request bằng filter, kèm **correlation id** để lần vết một r
 - Phân trang bằng `Pageable`, tài liệu bằng springdoc.
 - Test controller bằng `@WebMvcTest` + `MockMvc`.
 
+
+## 💻 Code ví dụ chạy được
+
+Module này có code chạy thật trong [../spring-playground/](../spring-playground/) — package `m11rest`:
+
+```bash
+cd spring-playground && mvn spring-boot:run     # rồi mở http://localhost:8080/
+```
+Nội dung: CRUD + DTO + validation + GlobalExceptionHandler + PageResponse.
+Endpoint: `/api/v1/books (201/400/404/409/500)`.
+
+> Vừa gọi API vừa **đọc console** — một nửa bài học nằm ở log SQL và log aspect.
+
 ## Bài tập
 👉 [bai-tap.md](bai-tap.md), sau đó sang [Module 12 — Spring Data JPA](../12-spring-data-jpa/).
