@@ -1,0 +1,12 @@
+{
+  "name": "design-patterns-demo",
+  "version": "1.0.0",
+  "description": "Buổi 49 — Design pattern & SOLID trong backend Node",
+  "type": "module",
+  "scripts": {
+    "truoc": "node src/truoc-refactor.js",
+    "demo": "node src/demo.js",
+    "test": "node --test"
+  },
+  "license": "ISC"
+}

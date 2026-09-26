@@ -1,0 +1,15 @@
+{
+  "name": "oauth2-oidc-demo",
+  "version": "1.0.0",
+  "description": "Buổi 50 — Đăng nhập bằng OAuth2 / OpenID Connect (Authorization Code + PKCE)",
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file=.env src/chay.js",
+    "test": "node --test"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.2.1",
+    "jose": "^6.2.12"
+  }
+}

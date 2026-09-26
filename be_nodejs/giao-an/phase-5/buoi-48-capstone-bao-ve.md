@@ -256,4 +256,5 @@ Từ `http.createServer` tới một hệ thống có auth, transaction, cache, 
 ---
 
 **Buổi trước:** [Buổi 47 — Capstone: thiết kế](./buoi-47-capstone-thiet-ke.md)
+**Buổi tiếp theo (tuỳ chọn):** [Phase 6 · Hero — Buổi 49: Design pattern & SOLID](../phase-6/buoi-49-design-pattern-solid.md)
 **Quay lại:** [Mục lục giáo án](../README.md)

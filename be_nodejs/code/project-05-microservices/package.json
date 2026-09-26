@@ -1,0 +1,32 @@
+{
+  "name": "project-05-microservices",
+  "version": "1.0.0",
+  "description": "Project 5 — Microservices: RabbitMQ, Outbox, Saga, OpenTelemetry, Prometheus",
+  "type": "module",
+  "scripts": {
+    "don-hang": "node --env-file=.env --import ./shared/tracing.js services/don-hang/main.js",
+    "kho": "node --env-file=.env --import ./shared/tracing.js services/kho/main.js",
+    "thong-bao": "node --env-file=.env --import ./shared/tracing.js services/thong-bao/main.js",
+    "tat-ca": "node --env-file=.env scripts/chay-tat-ca.js",
+    "tai": "node --env-file=.env scripts/tao-tai.js",
+    "test": "node --env-file=.env --test --test-concurrency=1"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "@opentelemetry/api": "^1.9.1",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.222.0",
+    "@opentelemetry/instrumentation-amqplib": "^0.69.0",
+    "@opentelemetry/instrumentation-express": "^0.70.0",
+    "@opentelemetry/instrumentation-http": "^0.222.0",
+    "@opentelemetry/instrumentation-pg": "^0.74.0",
+    "@opentelemetry/instrumentation-pino": "^0.68.0",
+    "@opentelemetry/resources": "^2.11.0",
+    "@opentelemetry/sdk-node": "^0.222.0",
+    "@opentelemetry/semantic-conventions": "^1.43.0",
+    "amqplib": "^2.0.1",
+    "express": "^5.2.1",
+    "pg": "^8.23.0",
+    "pino": "^10.3.1",
+    "prom-client": "^15.1.3"
+  }
+}

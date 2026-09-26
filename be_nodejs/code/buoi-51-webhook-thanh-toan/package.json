@@ -1,0 +1,14 @@
+{
+  "name": "webhook-thanh-toan-demo",
+  "version": "1.0.0",
+  "description": "Buổi 51 — Tích hợp thanh toán & webhook an toàn",
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file=.env src/chay.js",
+    "test": "node --test"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}

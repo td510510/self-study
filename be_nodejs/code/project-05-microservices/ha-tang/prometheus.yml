@@ -1,0 +1,16 @@
+global:
+  scrape_interval: 5s   # production thường 15–30s; để 5s cho lớp học thấy số đổi nhanh
+
+scrape_configs:
+  # Ba dịch vụ Node chạy trên máy thật
+  - job_name: dich-vu
+    static_configs:
+      # Nhãn `service` do chính dịch vụ gắn (quan-sat.js → setDefaultLabels)
+      - targets: ["host.docker.internal:3201", "host.docker.internal:3202", "host.docker.internal:3203"]
+
+  # RabbitMQ có sẵn plugin Prometheus. /per-object cho số liệu TỪNG hàng đợi
+  # (mặc định chỉ có tổng — không biết hàng đợi nào đang dồn).
+  - job_name: rabbitmq
+    metrics_path: /metrics/per-object
+    static_configs:
+      - targets: ["rabbitmq:15692"]

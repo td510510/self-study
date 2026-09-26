@@ -1,4 +1,4 @@
-# Giáo án chi tiết — 48 buổi
+# Giáo án chi tiết — 55 buổi
 
 Mỗi file giáo án gồm: **dòng thời gian 180 phút**, lý thuyết giảng giải, kịch bản thực hành từng bước, bài tập về nhà, checklist kết thúc buổi, và các mục **📝 Ghi chú giảng viên** chỉ ra chỗ học viên hay hiểu sai.
 
@@ -82,6 +82,20 @@ Mỗi file giáo án gồm: **dòng thời gian 180 phút**, lý thuyết giản
 | [47](./phase-5/buoi-47-capstone-thiet-ke.md) | **Capstone** — thiết kế | — |
 | [48](./phase-5/buoi-48-capstone-bao-ve.md) | **Capstone** — bảo vệ & tổng kết khoá học | — |
 
+## Phase 6 — Hero *(tuần 17–19)*
+
+Dành cho người đã xong capstone và muốn vượt mức junior. Thêm **58 test** (13 + 15 + 18 + 12), tất cả đã chạy thật.
+
+| Buổi | Chủ đề | Code |
+|---|---|---|
+| [49](./phase-6/buoi-49-design-pattern-solid.md) | Design pattern & SOLID trong backend Node | [`buoi-49-design-patterns/`](../code/buoi-49-design-patterns/) |
+| [50](./phase-6/buoi-50-oauth2-oidc.md) | Đăng nhập bằng OAuth2 / OpenID Connect (PKCE) | [`buoi-50-oauth2-oidc/`](../code/buoi-50-oauth2-oidc/) |
+| [51](./phase-6/buoi-51-thanh-toan-webhook.md) | Thanh toán & webhook: chữ ký, trùng, sai thứ tự, đối soát | [`buoi-51-webhook-thanh-toan/`](../code/buoi-51-webhook-thanh-toan/) |
+| [52](./phase-6/buoi-52-rabbitmq.md) | Message broker: RabbitMQ (và khi nào cần Kafka) | [`project-05-microservices/`](../code/project-05-microservices/) |
+| [53](./phase-6/buoi-53-microservices-outbox-saga.md) | Microservices: tách dịch vụ, Outbox, Saga | ↑ |
+| [54](./phase-6/buoi-54-observability.md) | Observability: OpenTelemetry, Prometheus, Grafana | ↑ |
+| [55](./phase-6/buoi-55-dien-tap-su-co.md) | **Diễn tập sự cố**, postmortem & tổng kết | ↑ |
+
 ---
 
 ## Mạch kiến thức xuyên suốt
@@ -106,5 +120,12 @@ Các buổi được thiết kế để **tham chiếu chéo lẫn nhau**. Một
 | Transaction + khoá dòng | 19 | 45 (vì sao microservices làm nó khó) |
 | Mã lỗi ổn định (`ma`) | 18 | 24, 46 (API contract), 47 (Capstone) |
 | Toàn bộ khoá học | 01–47 | **48 (bảo vệ Capstone)** |
+| Tách tầng, DI | 09, 28 | 49 (tự viết composition root — mở hộp NestJS) |
+| JWT HS256 | 15 | 50 (RS256 + JWKS của nhà cung cấp) |
+| Idempotency key | 24 | 26 (job), 51 (webhook), 53 (inbox) — **bốn lần, bốn tên** |
+| Giới hạn song song | 07 | 20 (pool), 26 (concurrency), 52 (prefetch), 55 (pool bão hoà) |
+| Observer / sự kiện | 49 (trong bộ nhớ) | 52 (RabbitMQ), 53 (outbox — sống sót khi chết) |
+| `requestId` xuyên service | 43 | 54 (trace W3C xuyên RabbitMQ và outbox) |
+| Đo rồi mới kết luận | 02, 19, 44 | **55 (một kết luận sai được trace và đo lại chặn đứng)** |
 
 > **Lời khuyên khi dạy:** mỗi khi gặp một ô trong bảng trên, hãy nói rõ *"cái này ta đã gặp ở buổi X"* hoặc *"cái này sẽ quay lại ở buổi Y"*. Học viên nhớ theo mạch liên kết chứ không nhớ theo danh sách rời rạc.

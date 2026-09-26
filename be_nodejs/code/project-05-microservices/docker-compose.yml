@@ -1,0 +1,72 @@
+# Project 5 — hạ tầng cho 3 dịch vụ Node chạy trên máy (npm run ...).
+#
+#   docker compose up -d
+#
+# Tên project/container/cổng đều khác các project trước để chạy song song được.
+name: hocbe-micro
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: hocbe-micro-postgres
+    environment:
+      POSTGRES_USER: hoc
+      POSTGRES_PASSWORD: hoc
+      POSTGRES_DB: postgres
+    ports: ["5440:5432"]
+    volumes:
+      # MỖI DỊCH VỤ MỘT DATABASE — không dịch vụ nào đọc bảng của dịch vụ khác.
+      # (Chung một máy chủ Postgres cho tiết kiệm; production thường tách hẳn.)
+      - ./ha-tang/postgres-init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hoc"]
+      interval: 3s
+      retries: 20
+
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    container_name: hocbe-micro-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: hoc
+      RABBITMQ_DEFAULT_PASS: hoc
+    ports:
+      - "5673:5672"     # AMQP — dịch vụ kết nối vào đây
+      - "15673:15672"   # giao diện quản trị: http://localhost:15673 (hoc/hoc)
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      retries: 20
+
+  jaeger:
+    # Nhận trace qua OTLP (chuẩn của OpenTelemetry) và hiển thị
+    image: jaegertracing/all-in-one:1.76.0
+    container_name: hocbe-micro-jaeger
+    ports:
+      - "16686:16686"   # giao diện: http://localhost:16686
+      - "4318:4318"     # OTLP/HTTP — dịch vụ gửi trace vào đây
+
+  prometheus:
+    image: prom/prometheus:v3.7.3
+    container_name: hocbe-micro-prometheus
+    volumes:
+      - ./ha-tang/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports: ["9091:9090"]  # http://localhost:9091
+    # Dịch vụ Node chạy trên MÁY THẬT, không trong Docker → cần đường về máy chủ.
+    # Docker Desktop có sẵn host.docker.internal; Linux cần dòng này.
+    extra_hosts: ["host.docker.internal:host-gateway"]
+
+  grafana:
+    image: grafana/grafana:12.2.1
+    container_name: hocbe-micro-grafana
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+    volumes:
+      - ./ha-tang/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./ha-tang/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports: ["3301:3000"]  # http://localhost:3301
+
+volumes:
+  pgdata:

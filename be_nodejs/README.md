@@ -1,6 +1,6 @@
 # Backend Zero → Hero — Node.js · Express.js · NestJS
 
-Giáo trình đào tạo backend 48 buổi, dành cho **lập trình viên frontend đã vững JavaScript**.
+Giáo trình đào tạo backend 55 buổi (48 buổi chính + 7 buổi Hero), dành cho **lập trình viên frontend đã vững JavaScript**.
 
 Repo này chứa hai thứ song song:
 
@@ -35,6 +35,7 @@ Học viên đã biết JavaScript, nên khoá học **không dạy lại cú ph
 | **3** | 19–27 | Index/N+1/transaction, Redis, OWASP, WebSocket, queue, Docker | Project 3: nâng cấp Project 2 lên production-grade |
 | **4** | 28–39 | NestJS: DI, lifecycle, DTO, guard, test, Swagger | Project 4: rebuild E-commerce bằng NestJS |
 | **5** | 40–48 | CI/CD, deploy, monitoring, load test, system design | Capstone tự chọn đề tài |
+| **6 · Hero** | 49–55 | Design pattern, OAuth2/OIDC, thanh toán & webhook, RabbitMQ, Outbox/Saga, OpenTelemetry, diễn tập sự cố | Project 5: microservices hướng sự kiện |
 
 Chi tiết từng buổi: xem **[giao-an/](./giao-an/)**.
 
@@ -54,14 +55,17 @@ be_nodejs/
 │   ├── phase-2/  buoi-10 … buoi-18
 │   ├── phase-3/  buoi-19 … buoi-27
 │   ├── phase-4/  buoi-28 … buoi-39
-│   └── phase-5/  buoi-40 … buoi-48
+│   ├── phase-5/  buoi-40 … buoi-48
+│   └── phase-6/  buoi-49 … buoi-55       ← Hero
 └── code/
     ├── buoi-01-raw-http/  …  buoi-17-upload-testing/
     ├── project-01-todo-api/      ← Project 1  (Node thuần)
     ├── project-02-ecommerce/     ← Project 2 & 3  (Express)
     │   ├── deploy/               ← nginx.conf, ecosystem.config.cjs (buổi 42)
     │   └── benchmark/do-tai.mjs  ← đo tải (buổi 44)
-    └── project-04-nestjs/        ← Project 4  (NestJS)
+    ├── project-04-nestjs/        ← Project 4  (NestJS)
+    ├── buoi-49-design-patterns/  buoi-50-oauth2-oidc/  buoi-51-webhook-thanh-toan/
+    └── project-05-microservices/ ← Project 5  (3 dịch vụ + RabbitMQ + OTel, buổi 52–55)
 ```
 
 Mỗi thư mục trong `code/` là một dự án Node độc lập, có `README.md` riêng ghi rõ cách chạy.
@@ -75,7 +79,7 @@ Mỗi thư mục trong `code/` là một dự án Node độc lập, có `README
 | Node.js | **≥ 20.6** | Cần cho `--env-file` gốc, không phải cài `dotenv` |
 | npm | ≥ 10 | Đi kèm Node |
 | VS Code | mới nhất | Kèm extension REST Client hoặc dùng Postman |
-| Docker Desktop | mới nhất | Bắt đầu cần từ Phase 2 (Postgres, Redis) |
+| Docker Desktop | mới nhất | Bắt đầu cần từ Phase 2 (Postgres, Redis); Phase 6 thêm RabbitMQ, Jaeger, Prometheus, Grafana |
 | Git | ≥ 2.40 | |
 
 Kiểm tra nhanh:
@@ -107,6 +111,8 @@ Mỗi buổi kết thúc bằng bài tập về nhà bắt buộc. Bài tập bu
 - [x] **Phase 4 — buổi 28–39** ✅ giáo án + code + **Project 4 (9 unit + 18 e2e pass)**
 - [x] **Phase 5 — buổi 40–48** ✅ giáo án + CI/CD workflow + cấu hình deploy + benchmark đã đo thật
 
-**🎓 Hoàn tất 48/48 buổi.**
+- [x] **Phase 6 — buổi 49–55 (Hero)** ✅ giáo án + code + **58 test pass** (13 + 15 + 18, cộng 12 test tích hợp với Postgres/RabbitMQ thật) + diễn tập sự cố đã đo thật
+
+**🎓 Hoàn tất 55/55 buổi.**
 
 > Mọi code trong `code/` đều đã được **chạy thật và kiểm chứng output**, không phải code viết ra rồi để đó. Các số liệu trong giáo án (thời gian, bộ nhớ, kết quả sai/đúng) là số đo thực tế.
