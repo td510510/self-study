@@ -232,4 +232,4 @@ List<String> clean = list.stream().filter(Objects::nonNull).toList();
 - [src/fp/StreamDemo.java](src/fp/StreamDemo.java) — toàn bộ thao tác stream trên dữ liệu đơn hàng
 - [src/fp/CollectorsDemo.java](src/fp/CollectorsDemo.java) — groupingBy, partitioningBy, thống kê
 
-👉 Làm [bai-tap.md](bai-tap.md) rồi sang [Module 06 — Concurrency](../06-concurrency/).
+👉 Làm [bai-tap.md](bai-tap.md) và [luyen-tay.md](luyen-tay.md) rồi sang [Module 05b — Design Patterns](../05b-design-patterns/).

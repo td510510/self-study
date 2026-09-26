@@ -1,7 +1,8 @@
 # Dự án 3 — Shop Microservices
 
 > Làm sau Module 15. Dự án cuối: hệ thống thương mại điện tử rút gọn gồm 4 service + gateway.
-> Thư mục này cung cấp **kiến trúc, hợp đồng API, hạ tầng và checklist** — mã nguồn service là phần bạn tự viết.
+> Thư mục này cung cấp **kiến trúc, hợp đồng API, hạ tầng, checklist** và **một service mẫu hoàn chỉnh** ([product-service](product-service/)).
+> Bốn service còn lại là phần bạn tự viết theo mẫu đó.
 
 Đây là dự án để **học các vấn đề của hệ phân tán**, không phải để chứng minh microservices tốt hơn monolith. Trong lúc làm, hãy liên tục tự hỏi: *"Nếu để nguyên monolith thì việc này đơn giản hơn bao nhiêu?"* — trả lời được câu đó chính là thứ nhà tuyển dụng muốn nghe.
 
@@ -109,9 +110,10 @@ So sánh thẳng thắn: trong monolith, toàn bộ luồng này là **một tra
 
 ## Chạy hệ thống
 
-> ⚠ **Đọc trước**: 5 thư mục service hiện chỉ có `Dockerfile` + đặc tả, **chưa có mã nguồn** —
-> phần đó là bài tập của bạn (xem mục "Ghi chú về mã nguồn" ở cuối). Vì vậy `docker compose up`
-> đầy đủ sẽ **chưa chạy được** cho tới khi bạn viết xong ít nhất một service.
+> ⚠ **Đọc trước**: chỉ `product-service` có sẵn mã nguồn (service mẫu, đã kiểm chứng chạy được).
+> 4 thư mục còn lại chỉ có `Dockerfile` + đặc tả — đó là bài tập của bạn (xem "Ghi chú về mã nguồn" ở cuối).
+> Vì vậy `docker compose up` **toàn bộ** chưa chạy được cho tới khi bạn viết xong các service kia;
+> trong lúc đó hãy chạy từng phần như Bước 1.
 
 **Bước 1 — chạy riêng hạ tầng** (làm được ngay từ hôm nay):
 ```bash
@@ -119,6 +121,10 @@ cd projects/p3-shop-microservices
 cp .env.example .env
 docker compose up -d postgres redis kafka prometheus grafana
 docker compose ps                  # kiểm tra 5 container đều healthy
+
+# Service mẫu chạy được ngay
+docker compose up -d --build product-service
+curl localhost:8082/api/v1/products
 ```
 
 **Bước 2 — sau khi đã viết service**, chạy toàn bộ:
@@ -157,8 +163,8 @@ docker compose logs -f notification-service
 ## Lộ trình làm (đừng làm cùng lúc tất cả)
 
 **Tuần 1 — dựng nền**
-1. Tách `auth-service` từ Dự án 2, chạy độc lập với DB riêng.
-2. Viết `product-service` với CRUD + tồn kho.
+1. Đọc và chạy [product-service](product-service/) (service mẫu), trả lời 6 câu hỏi trong README của nó.
+2. Tách `auth-service` từ Dự án 2, chạy độc lập với DB riêng — theo cấu trúc của product-service.
 3. Dựng API Gateway định tuyến tới 2 service.
 4. `docker compose up` chạy được cả 3.
 
@@ -211,7 +217,7 @@ Viết câu trả lời vào `docs/reflection.md` — đây chính là nội dun
 
 ## Ghi chú về mã nguồn
 
-Thư mục này cố ý cung cấp **kiến trúc, hợp đồng API, hạ tầng và checklist** thay vì toàn bộ mã nguồn 4 service. Lý do: tới thời điểm này bạn đã có đủ nền tảng từ Dự án 1 và 2 — mỗi service ở đây về bản chất là một Spring Boot API giống Dự án 2 nhưng nhỏ hơn. Giá trị học tập nằm ở việc **bạn tự nối chúng lại** và tự vấp phải các vấn đề phân tán.
+Thư mục này cố ý chỉ cung cấp **một** service hoàn chỉnh — [product-service](product-service/) — làm mẫu tham chiếu, cùng kiến trúc, hợp đồng API, hạ tầng và checklist cho phần còn lại. Service mẫu cho bạn thấy "một service đạt chuẩn trông như thế nào": cấu trúc package, Flyway, cache Redis, idempotency, xử lý đồng thời, log JSON có traceId, health probe, test trên PostgreSQL/Redis thật. Bốn service còn lại về bản chất là Spring Boot API giống Dự án 2 nhưng nhỏ hơn; giá trị học tập nằm ở việc **bạn tự viết và tự nối chúng lại**, và tự vấp phải các vấn đề phân tán.
 
 Tài liệu hỗ trợ trong [docs/](docs/):
 - [docs/api-contracts.md](docs/api-contracts.md) — hợp đồng API giữa các service

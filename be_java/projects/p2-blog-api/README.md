@@ -36,8 +36,8 @@ mvn spring-boot:run -Dspring-boot.run.profiles=dev
 
 **Chạy test**:
 ```bash
-mvn test                       # cần Docker đang chạy cho test tích hợp
-mvn test -Dtest=PostServiceTest       # chỉ unit test, không cần Docker
+mvn test                       # unit test, không cần Docker
+mvn verify                     # unit test + integration test (cần Docker đang chạy)
 ```
 
 > **Chưa có Maven?** Dự án này chưa kèm sẵn Maven Wrapper (`mvnw`). Chọn một trong ba cách:
@@ -46,10 +46,16 @@ mvn test -Dtest=PostServiceTest       # chỉ unit test, không cần Docker
 > 3. Sinh wrapper một lần rồi commit vào repo (sau khi đã có Maven): `mvn wrapper:wrapper`
 >    — từ đó về sau cả team dùng `./mvnw` mà không cần cài gì.
 
-> ⚠ **Lưu ý trung thực về mã nguồn**: toàn bộ code ở đây được viết theo chuẩn Spring Boot 3.3
-> nhưng **chưa từng được biên dịch/chạy** (lúc tạo dự án máy chưa cài Maven).
-> Lần `mvn test` đầu tiên có thể phát sinh vài lỗi nhỏ (thiếu import, lệch version thư viện).
-> Hãy coi đó là bài tập đầu tiên: đọc thông báo lỗi và tự sửa — đúng như công việc thật.
+> ✅ **Đã kiểm chứng**: `mvn verify` chạy xanh — 23 unit test (`mvn test`, không cần Docker) và
+> 8 integration test `AuthFlowIT` trên PostgreSQL thật qua Testcontainers (cần Docker Desktop đang chạy).
+>
+> Những lỗi đã gặp và sửa trong lần build đầu — đọc để rút kinh nghiệm:
+> - `ErrorResponse.of(...)` được gọi nhưng chưa được viết → lỗi biên dịch.
+> - Test `@WebMvcTest` dùng `@MockBean` cho **chính** `JwtAuthenticationFilter`: mock của một Filter không gọi
+>   `chain.doFilter()` → mọi request dừng ở filter, mọi test nhận `200` rỗng. Đúng ra phải mock các **phụ thuộc** của filter.
+> - Bảo mật: `/api/v1/auth/**` được `permitAll()` nên cả `/auth/me` và `/auth/change-password` không cần đăng nhập
+>   (gọi thiếu token → `NullPointerException` → 500). Đã sửa thành liệt kê từng endpoint công khai.
+> - Testcontainers 1.20.x không nói chuyện được với Docker Engine 29+ (yêu cầu API ≥ 1.44) → nâng lên 1.21.4.
 
 ## Kiến trúc
 

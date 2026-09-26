@@ -124,7 +124,7 @@ public class GlobalExceptionHandler {
                 traceId, req.getMethod(), req.getRequestURI(), e);
         ErrorResponse body = ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_ERROR",
                 "Có lỗi xảy ra, vui lòng thử lại. Mã tra cứu: " + traceId,
-                req.getRequestURI(), null);
+                req.getRequestURI(), null, traceId);    // cùng traceId với dòng log ở trên
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 

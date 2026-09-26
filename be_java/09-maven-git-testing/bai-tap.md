@@ -40,6 +40,27 @@ Chạy `mvn clean package`, tìm file jar trong `target/`, chạy `java -jar`.
 
 **B7.** Tạo Pull Request trên GitHub từ nhánh feature, tự review, merge bằng "Squash and merge".
 
+**B8. Luyện conflict.** Trên 2 nhánh khác nhau, sửa **cùng một dòng** trong một file theo 2 cách khác nhau. Merge nhánh thứ nhất vào `main`, rồi rebase nhánh thứ hai lên `main` và tự giải quyết conflict. Làm lại lần nữa bằng `git merge` thay cho rebase, so sánh `git log --oneline --graph` của hai cách.
+
+**B9. Làm việc nhóm (cần 1 bạn học cùng, hoặc tự đóng 2 vai).** Bật **branch protection** cho `main` (bắt buộc PR + 1 approve + CI xanh). Mỗi người mở 1 PR cho repo của người kia theo mẫu mô tả ở mục 2.7, và review PR của người kia với ít nhất 3 comment có lý do cụ thể.
+*Đạt khi*: không ai push thẳng được lên `main`; mỗi PR có mô tả đủ 3 phần *Vì sao / Thay đổi / Kiểm thử*.
+
+**B10. Review thử.** Tìm ít nhất 6 vấn đề trong đoạn code sau, sắp theo mức độ nghiêm trọng, viết comment như khi review thật:
+```java
+@GetMapping("/orders")
+public List<Order> orders(@RequestParam Long userId) {
+    List<Order> result = new ArrayList<>();
+    for (Order o : orderRepository.findAll()) {
+        if (o.getUserId() == userId) {
+            o.setCustomerName(userRepository.findById(o.getUserId()).get().getName());
+            result.add(o);
+        }
+    }
+    System.out.println("found " + result.size());
+    return result;
+}
+```
+
 ## Nhóm C — JUnit
 
 **C1.** Viết test đầy đủ cho `MathUtils` (bài F1 module 01): `isPrime`, `gcd`, `factorial`, `power`.
@@ -99,6 +120,9 @@ Bao gồm: ca thường, ca biên (0, 1, số âm, giá trị lớn), ca lỗi (
 3. Xung đột phiên bản xử lý ra sao?
 4. `git merge` khác `git rebase`?
 5. `git reset` khác `git revert`? Khi nào dùng cái nào?
+6. `git push --force` và `--force-with-lease` khác nhau thế nào? Khi nào được phép force push?
+7. Bạn xử lý conflict thế nào? Sau khi giải quyết conflict cần làm gì?
+8. Khi review code bạn chú ý những gì? Một PR tốt trông như thế nào?
 6. Unit test khác integration test?
 7. Mock là gì? Khi nào nên và không nên mock?
 8. Coverage 100% có nghĩa là code không có bug không?

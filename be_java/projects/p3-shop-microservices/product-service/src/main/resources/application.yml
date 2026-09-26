@@ -1,0 +1,65 @@
+spring:
+  application:
+    name: product-service
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/product_db}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 3000        # hết connection thì báo lỗi sau 3s, không treo request
+
+  jpa:
+    hibernate:
+      ddl-auto: validate              # schema do Flyway quản lý
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+  flyway:
+    enabled: true
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 500ms                  # Redis chậm thì bỏ qua cache, không kéo chậm cả request
+
+  cache:
+    type: redis                       # TTL từng cache: xem CacheConfig
+
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
+
+server:
+  port: ${SERVER_PORT:8082}
+  shutdown: graceful                  # nhận SIGTERM: ngừng nhận request mới, xử lý nốt request đang dở
+  error:
+    include-stacktrace: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true                 # /actuator/health/liveness và /actuator/health/readiness
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name},%X{traceId:-}]"
+  level:
+    com.learn.shop: INFO

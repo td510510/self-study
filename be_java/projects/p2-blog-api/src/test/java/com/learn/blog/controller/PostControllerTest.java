@@ -8,7 +8,7 @@ import com.learn.blog.dto.post.PostResponse;
 import com.learn.blog.exception.ForbiddenException;
 import com.learn.blog.exception.NotFoundException;
 import com.learn.blog.security.CustomUserDetails;
-import com.learn.blog.security.JwtAuthenticationFilter;
+import com.learn.blog.security.JwtService;
 import com.learn.blog.service.PostService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +17,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
@@ -51,7 +52,12 @@ class PostControllerTest {
     @Autowired ObjectMapper objectMapper;
 
     @MockBean PostService postService;
-    @MockBean JwtAuthenticationFilter jwtAuthenticationFilter;   // không cần token thật trong test này
+    // Dùng filter JWT THẬT, chỉ mock các phụ thuộc của nó. Test không gửi header Authorization
+    // (đăng nhập giả bằng .with(user(...))) nên filter chỉ việc cho request đi tiếp.
+    // ⚠ Đừng @MockBean chính JwtAuthenticationFilter: mock của một Filter không gọi chain.doFilter()
+    //   -> request dừng ngay tại filter, MỌI test nhận về 200 với body rỗng.
+    @MockBean JwtService jwtService;
+    @MockBean UserDetailsService userDetailsService;
 
     private PostResponse samplePost() {
         return new PostResponse(1L, "hoc-java", "Học Java", "Tóm tắt", "Nội dung",
@@ -101,7 +107,7 @@ class PostControllerTest {
 
         mockMvc.perform(get("/api/v1/posts/khong-co"))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.errorCode").value("RESOURCE_NOT_FOUND"))
+                .andExpect(jsonPath("$.errorCode").value("NOT_FOUND"))
                 .andExpect(jsonPath("$.path").value("/api/v1/posts/khong-co"));
     }
 
@@ -153,7 +159,7 @@ class PostControllerTest {
 
         mockMvc.perform(delete("/api/v1/posts/1").with(user(principal(2L, "ROLE_USER"))))
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.errorCode").value("ACCESS_DENIED"));
+                .andExpect(jsonPath("$.errorCode").value("FORBIDDEN"));
     }
 
     @Test

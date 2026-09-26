@@ -62,6 +62,9 @@ management:
         include: health,info,metrics
 
 logging:
+  pattern:
+    # Chèn requestId (do RequestIdFilter đặt vào MDC) vào MỌI dòng log, ngay sau mức log.
+    level: "%5p [%X{requestId:-no-request}]"
   level:
     com.learn.playground: DEBUG
     org.hibernate.SQL: DEBUG

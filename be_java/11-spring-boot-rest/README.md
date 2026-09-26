@@ -3,6 +3,9 @@
 > Mục tiêu: xây REST API đúng chuẩn công nghiệp — thiết kế endpoint, DTO, validation, xử lý lỗi thống nhất, phân trang, tài liệu OpenAPI.
 > Thời lượng: 2 tuần. Đây là công việc hằng ngày của một backend developer.
 
+> 📖 **Đọc trước:** [http-va-web.md](http-va-web.md) — DNS, TCP, HTTP, HTTPS, cookie/token, CORS. Chưa nắm phần này thì
+> khi API lỗi bạn sẽ không biết lỗi nằm ở tầng nào.
+
 ---
 
 ## 1. REST là gì (mức cần dùng)
@@ -400,7 +403,198 @@ management:
         include: health,info,metrics       # Actuator
 ```
 
-Ghi log request bằng filter, kèm **correlation id** để lần vết một request qua nhiều service (chi tiết ở Module 15).
+Ghi log request bằng filter, kèm **request id** để lần vết — xem mục 10.4.
+
+---
+
+## 10. Logging — thứ duy nhất bạn có khi production gặp sự cố
+
+Trên production không có debugger, không có `System.out` nào được nhìn thấy. Khi khách báo "em bấm đặt hàng bị lỗi lúc 10 giờ", thứ duy nhất bạn có là **log**. Log tốt thì tìm ra lỗi trong 5 phút; log tệ thì đoán mò cả ngày.
+
+### 10.1 SLF4J + Logback — bộ đôi mặc định
+
+- **SLF4J** là *interface* (API) để ghi log. Code của bạn chỉ phụ thuộc vào nó.
+- **Logback** là *cài đặt* thật sự, Spring Boot đã kèm sẵn. Muốn đổi sang Log4j2 thì chỉ đổi dependency, code không sửa (lại là nguyên tắc Dependency Inversion).
+
+```java
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@Service
+public class OrderService {
+    private static final Logger log = LoggerFactory.getLogger(OrderService.class);
+    // hoặc dùng Lombok: @Slf4j trên class là có sẵn biến `log`
+
+    public Order place(PlaceOrderRequest req, long userId) {
+        log.info("Đặt hàng: userId={}, số sản phẩm={}", userId, req.items().size());
+        ...
+    }
+}
+```
+
+**Không bao giờ dùng `System.out.println` trong code ứng dụng**: không có thời gian, không có mức độ, không tắt được, không gom được về hệ thống log tập trung.
+
+### 10.2 Năm mức log — chọn cho đúng
+
+| Mức | Dùng khi | Ví dụ |
+|---|---|---|
+| `ERROR` | lỗi cần người xử lý, **có kèm exception** | không kết nối được DB, bug không lường trước |
+| `WARN` | bất thường nhưng hệ thống tự xoay xở được | gọi đối tác lỗi, đang thử lại; cấu hình thiếu, dùng mặc định |
+| `INFO` | sự kiện nghiệp vụ quan trọng, **ít và có ý nghĩa** | đơn hàng được tạo, người dùng đăng nhập, job chạy xong |
+| `DEBUG` | chi tiết để dev điều tra | giá trị tham số, nhánh if nào được chọn |
+| `TRACE` | cực chi tiết | từng vòng lặp, giá trị bind SQL |
+
+Production thường bật `INFO` trở lên, và bật `DEBUG` cho riêng một package khi cần điều tra:
+```yaml
+logging:
+  level:
+    root: INFO
+    com.learn.shop.order: DEBUG     # chỉ package này
+    org.hibernate.SQL: DEBUG        # xem SQL Hibernate sinh ra
+```
+Có Actuator thì đổi mức log lúc đang chạy, không cần deploy lại: `POST /actuator/loggers/com.learn.shop.order` với body `{"configuredLevel":"DEBUG"}` (endpoint này phải được bảo vệ).
+
+Lỗi nghiệp vụ bình thường (sai mật khẩu, không đủ hàng, 404) là `DEBUG` hoặc `INFO`, **không phải `ERROR`**. Nếu mọi thứ đều là ERROR thì chẳng ai để ý khi có ERROR thật.
+
+### 10.3 Viết log đúng cách
+
+```java
+// ✅ Placeholder {}: chuỗi chỉ được dựng khi mức log đang bật -> không tốn CPU khi tắt DEBUG
+log.debug("Tính giá cho đơn {} với {} sản phẩm", orderId, items.size());
+
+// ❌ Nối chuỗi: luôn dựng chuỗi, kể cả khi DEBUG đang tắt
+log.debug("Tính giá cho đơn " + orderId + " với " + items.size() + " sản phẩm");
+
+// ✅ Exception luôn là tham số CUỐI và KHÔNG có {} tương ứng -> in đầy đủ stacktrace
+log.error("Không tạo được đơn cho user {}", userId, e);
+
+// ❌ Mất stacktrace — chỉ còn một dòng message, không biết lỗi từ đâu ra
+log.error("Lỗi: " + e.getMessage());
+
+// ❌ Log rồi ném lại: cùng một lỗi xuất hiện 3–4 lần trong log, mỗi tầng một lần
+catch (Exception e) { log.error("Lỗi", e); throw e; }
+// ✅ Hoặc xử lý (và log), hoặc ném lên — không làm cả hai. Để GlobalExceptionHandler log một lần.
+```
+
+**Log cái gì?** Đủ để trả lời *ai, làm gì, với cái gì, kết quả ra sao*: id người dùng, id đơn hàng, số lượng, thời gian xử lý.
+
+**KHÔNG BAO GIỜ log**: mật khẩu, token/JWT, số thẻ, OTP, toàn bộ body request (có thể chứa những thứ trên). Log thường được nhiều người đọc hơn database và lưu lâu hơn.
+
+### 10.4 Request ID — nối các dòng log của cùng một request
+
+Server xử lý 50 request cùng lúc, log của chúng xen kẽ nhau. Giải pháp: gắn một mã cho mỗi request và in nó trên **mọi dòng log** bằng **MDC** (Mapped Diagnostic Context — một Map gắn với thread hiện tại).
+
+```java
+@Component
+@Order(Ordered.HIGHEST_PRECEDENCE)          // chạy trước mọi filter khác, kể cả Spring Security
+public class RequestIdFilter extends OncePerRequestFilter {
+    @Override
+    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
+            throws ServletException, IOException {
+        String id = Optional.ofNullable(req.getHeader("X-Request-Id")).orElse(UUID.randomUUID().toString());
+        MDC.put("requestId", id);
+        res.setHeader("X-Request-Id", id);          // trả về để người dùng báo lỗi kèm mã
+        try {
+            chain.doFilter(req, res);
+        } finally {
+            MDC.remove("requestId");                // BẮT BUỘC: thread Tomcat được tái sử dụng
+        }
+    }
+}
+```
+```yaml
+logging:
+  pattern:
+    level: "%5p [%X{requestId:-}]"
+```
+Kết quả:
+```
+INFO [a1b2c3d4] RequestIdFilter : GET /api/v1/orders/9 -> 404 (12 ms)
+INFO [e5f6a7b8] OrderService    : Đặt hàng: userId=42, số sản phẩm=3
+WARN [e5f6a7b8] ProductClient   : Gọi product-service lỗi, thử lại lần 2
+```
+Trả chính mã đó làm `traceId` trong `ErrorResponse` → khách báo mã, bạn tìm log ra ngay toàn bộ câu chuyện. Ở microservices, gateway sinh mã và **chuyển tiếp qua header** cho mọi service phía sau (Module 15 dùng OpenTelemetry làm việc này tự động).
+
+Bản đầy đủ (kiểm tra header client gửi để chống log injection, ghi một dòng access log cho mỗi request) ở `spring-playground/.../m11rest/RequestIdFilter.java`.
+
+> ⚠ MDC gắn với **thread**. Code chạy ở thread khác (`@Async`, `CompletableFuture`) sẽ mất MDC — phải copy sang (Spring có `TaskDecorator` cho việc này).
+
+### 10.5 Log ra file và log dạng JSON
+
+Mặc định Spring Boot log ra console — đúng với Docker/Kubernetes (hệ thống tự gom stdout). Chạy trên máy chủ thường thì ghi thêm file có xoay vòng:
+```yaml
+logging:
+  file:
+    name: logs/app.log
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 14          # giữ 14 file
+```
+Production thường log **JSON** (mỗi dòng một object) để Loki/ELK tìm kiếm theo trường. Spring Boot 3.4+ có sẵn: `logging.structured.format.console: ecs`. Chi tiết ở Module 15.
+
+---
+
+## 11. Gọi API bên ngoài
+
+Backend thật luôn gọi hệ thống khác: cổng thanh toán, gửi SMS, tra tỷ giá, service khác trong công ty. Đây là chỗ **hệ thống của bạn hay sập vì lỗi của người khác** nhất.
+
+### 11.1 Chọn công cụ
+
+| Công cụ | Dùng khi |
+|---|---|
+| **`RestClient`** (Spring 6.1+) | **mặc định cho code mới**: API gọn, đồng bộ, hợp với virtual threads |
+| `RestTemplate` | code cũ; vẫn chạy nhưng không được phát triển thêm |
+| `WebClient` | ứng dụng reactive (WebFlux) |
+| `@HttpExchange` / OpenFeign | khai báo interface, framework tự cài đặt — gọn khi gọi nhiều endpoint của cùng một service |
+
+```java
+@Configuration
+class PaymentClientConfig {
+    @Bean
+    RestClient paymentClient(RestClient.Builder builder, @Value("${app.payment.base-url}") String baseUrl) {
+        var factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(Duration.ofSeconds(2));
+        factory.setReadTimeout(Duration.ofSeconds(5));
+        return builder.baseUrl(baseUrl).requestFactory(factory).build();
+    }
+}
+
+@Component
+class PaymentClient {
+    private final RestClient client;
+
+    PaymentClient(RestClient paymentClient) { this.client = paymentClient; }
+
+    ChargeResponse charge(ChargeRequest req) {
+        return client.post()
+                .uri("/v1/charges")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(req)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+                    throw new PaymentRejectedException(response.getStatusCode().value());
+                })
+                .body(ChargeResponse.class);
+    }
+}
+```
+
+### 11.2 Năm quy tắc sống còn
+
+1. **Luôn đặt timeout.** Mặc định của HTTP client trong JDK là *chờ vô hạn*. Đối tác treo → thread của bạn treo theo → hết 200 thread của Tomcat → **toàn bộ ứng dụng ngừng phản hồi**, kể cả những API không liên quan. Connect timeout 1–3 giây, read timeout theo cam kết (SLA) của đối tác.
+2. **Dịch lỗi của họ thành lỗi của mình.** `ResourceAccessException` (timeout, không kết nối được) và `HttpServerErrorException` phải được bắt và đổi thành exception nghiệp vụ → `503` với thông báo dễ hiểu. Đừng để chúng thành `500 INTERNAL_ERROR`.
+3. **Chỉ retry lỗi tạm thời, có giới hạn, có chờ tăng dần.** Retry: timeout, `503`, `429`. Không retry: `400`, `401`, `404` (gọi lại vẫn sai). Chờ 100ms → 200ms → 400ms (*exponential backoff*) để không dội thêm tải vào hệ thống đang quá tải.
+4. **Cẩn thận retry với thao tác không idempotent.** Gọi "trừ tiền" bị timeout — tiền đã trừ hay chưa? Retry mù quáng có thể trừ hai lần. Giải pháp: gửi kèm **idempotency key** (mã duy nhất cho mỗi giao dịch) để phía đối tác bỏ qua lần trùng (Module 14).
+5. **Mỗi đối tác một client riêng** (một class, một cấu hình timeout), log thời gian gọi, và chuyển tiếp `X-Request-Id`.
+
+Khi số lời gọi lớn và đối tác hay chết, bạn cần thêm **circuit breaker** (ngừng gọi một thời gian khi tỷ lệ lỗi cao) — Resilience4j ở Module 15.
+
+### 11.3 Test code gọi API ngoài
+
+Không gọi API thật trong test (chậm, tốn tiền, không kiểm soát được lỗi). Dùng:
+- `@RestClientTest` + `MockRestServiceServer` của Spring: giả lập response cho từng URL.
+- **WireMock**: dựng một HTTP server giả, giả lập cả độ trễ (`withFixedDelay(5000)`) để test timeout.
 
 ---
 
@@ -411,6 +605,8 @@ Ghi log request bằng filter, kèm **correlation id** để lần vết một r
 - `@Valid` + `@RestControllerAdvice` = mọi lỗi có một định dạng thống nhất.
 - Phân trang bằng `Pageable`, tài liệu bằng springdoc.
 - Test controller bằng `@WebMvcTest` + `MockMvc`.
+- Log bằng SLF4J với placeholder `{}`, đúng mức, có request id; không log dữ liệu nhạy cảm.
+- Gọi API ngoài: **luôn có timeout**, dịch lỗi của đối tác thành lỗi của mình, chỉ retry lỗi tạm thời.
 
 
 ## 💻 Code ví dụ chạy được
@@ -420,8 +616,9 @@ Module này có code chạy thật trong [../spring-playground/](../spring-playg
 ```bash
 cd spring-playground && mvn spring-boot:run     # rồi mở http://localhost:8080/
 ```
-Nội dung: CRUD + DTO + validation + GlobalExceptionHandler + PageResponse.
-Endpoint: `/api/v1/books (201/400/404/409/500)`.
+Nội dung: CRUD + DTO + validation + GlobalExceptionHandler + PageResponse; request id trong log (MDC);
+gọi API "đối tác" bằng RestClient có timeout và retry.
+Endpoint: `/api/v1/books` (201/400/404/409/500), `/m11/external/rates`, `/m11/external/rates?delayMs=5000`, `/m11/external/flaky`.
 
 > Vừa gọi API vừa **đọc console** — một nửa bài học nằm ở log SQL và log aspect.
 

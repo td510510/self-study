@@ -298,4 +298,4 @@ a.removeAll(list2);   // hiệu
 - [src/coll/MapSetDemo.java](src/coll/MapSetDemo.java) — Map/Set, đếm tần suất, gom nhóm
 - [src/coll/GenericsDemo.java](src/coll/GenericsDemo.java) — Box, method generic, PECS
 
-👉 Làm [bai-tap.md](bai-tap.md) rồi sang [Module 04 — Exception & I/O](../04-exception-io/).
+👉 Làm [bai-tap.md](bai-tap.md) và [luyen-tay.md](luyen-tay.md). Từ tuần này bắt đầu học **song song** [Module 03b — Cấu trúc dữ liệu & Giải thuật](../03b-dsa/) (2–3 giờ/tuần), rồi sang [Module 04 — Exception & I/O](../04-exception-io/).

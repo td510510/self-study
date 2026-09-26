@@ -425,4 +425,4 @@ Vì sao? Đổi từ lưu file sang lưu PostgreSQL chỉ cần viết `reposito
 javac -d out $(find 02-oop/src -name "*.java") && java -cp out oop.PaymentDemo
 ```
 
-👉 Làm [bai-tap.md](bai-tap.md) rồi sang [Module 03 — Collections & Generics](../03-collections-generics/).
+👉 Làm [bai-tap.md](bai-tap.md) và [luyen-tay.md](luyen-tay.md) rồi sang [Module 03 — Collections & Generics](../03-collections-generics/).

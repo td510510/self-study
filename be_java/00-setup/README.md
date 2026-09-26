@@ -217,4 +217,9 @@ Exception in thread "main" java.lang.NullPointerException
 - `main` phải là `public static void main(String[] args)`.
 - Cấu trúc thư mục phải khớp `package`; ghi nhớ layout Maven.
 
-👉 Làm [bai-tap.md](bai-tap.md) rồi sang [Module 01 — Java Core](../01-java-core/).
+## Tiếp theo: dòng lệnh
+
+Server chạy ứng dụng Java gần như luôn là Linux không có giao diện — bạn sẽ đọc log, tìm lỗi, khởi động lại app hoàn toàn bằng terminal.
+Đọc và làm bài tập trong **[dong-lenh.md](dong-lenh.md)** (2–3 buổi, có thể học rải rác trong tuần 1–2).
+
+👉 Làm [bai-tap.md](bai-tap.md) và [dong-lenh.md](dong-lenh.md), rồi sang [Module 01 — Java Core](../01-java-core/).

@@ -25,6 +25,10 @@ public class IndexController {
         m11.put("POST /api/v1/books", "tạo mới -> 201 + header Location");
         m11.put("POST /api/v1/books (dữ liệu sai)", "-> 400 kèm fieldErrors tiếng Việt");
         m11.put("GET  /api/v1/books/999", "-> 404 đúng định dạng ErrorResponse");
+        m11.put("(mọi request)", "log có requestId, response có header X-Request-Id — xem console");
+        m11.put("GET  /m11/external/rates", "gọi API đối tác bằng RestClient, chuyển tiếp X-Request-Id");
+        m11.put("GET  /m11/external/rates?delayMs=5000", "đối tác chậm -> read timeout 2s -> 503, KHÔNG treo thread");
+        m11.put("GET  /m11/external/flaky", "đối tác lỗi 503 hai lần -> retry có backoff -> thành công");
 
         Map<String, String> m12 = new LinkedHashMap<>();
         m12.put("GET /m12/n-plus-1/bad", "đếm số câu SQL khi bị N+1");

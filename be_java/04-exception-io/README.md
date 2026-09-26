@@ -290,4 +290,4 @@ Quy tắc backend: **lưu `Instant`/UTC trong DB, đổi sang giờ địa phư�
 - [src/io/FileDemo.java](src/io/FileDemo.java) — đọc/ghi file, CSV, đọc file lớn
 - [src/io/DateTimeDemo.java](src/io/DateTimeDemo.java) — java.time
 
-👉 Làm [bai-tap.md](bai-tap.md) rồi sang [Module 05 — Functional & Stream](../05-functional-stream/).
+👉 Làm [bai-tap.md](bai-tap.md) và [luyen-tay.md](luyen-tay.md) rồi sang [Module 05 — Functional & Stream](../05-functional-stream/).

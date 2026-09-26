@@ -55,7 +55,11 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // --- công khai ---
-                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        // Liệt kê TỪNG endpoint công khai, không mở cả "/api/v1/auth/**":
+                        // /auth/me và /auth/change-password nằm cùng controller nhưng BẮT BUỘC đăng nhập.
+                        // logout chỉ cần refresh token (access token lúc đó có thể đã hết hạn) nên để công khai.
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/register", "/api/v1/auth/login",
+                                "/api/v1/auth/refresh", "/api/v1/auth/logout").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/posts/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/tags/**").permitAll()
                         .requestMatchers("/actuator/health", "/actuator/info").permitAll()

@@ -89,6 +89,37 @@ GET  /api/v1/loans/overdue
 
 **F5.** Dùng Postman (hoặc file `.http` trong IntelliJ) tạo bộ collection gọi toàn bộ API, lưu vào repo.
 
+## Nhóm H — HTTP, logging & gọi API ngoài
+
+**H1.** Làm hết bài tập W1–W5 trong [http-va-web.md](http-va-web.md).
+
+**H2. Logging.** Trong Library API:
+- Thay mọi `System.out` bằng SLF4J. Mỗi thao tác nghiệp vụ (mượn, trả, tạo sách) có đúng **một** dòng `INFO`.
+- Thêm `RequestIdFilter` (MDC). `ErrorResponse.traceId` phải trùng header `X-Request-Id`.
+- Ghi log ra file `logs/library.log`, xoay vòng 10MB.
+*Đạt khi*: gọi một request lỗi, lấy `traceId` trong response, tìm được **mọi** dòng log của đúng request đó bằng một lệnh `grep`.
+
+**H3. Review log.** Tìm và sửa mọi chỗ sai trong đoạn sau (có ít nhất 5 lỗi):
+```java
+try {
+    log.info("Đăng nhập: email=" + email + ", password=" + password);
+    User u = userRepository.findByEmail(email).orElseThrow();
+    log.error("Không tìm thấy user " + email);
+    return jwtService.generate(u);
+} catch (Exception e) {
+    log.error("Lỗi đăng nhập: " + e.getMessage());
+    throw e;
+}
+```
+
+**H4. Gọi API ngoài.** Viết `ExchangeRateClient` gọi API tỷ giá công khai (ví dụ `https://open.er-api.com/v6/latest/USD`) bằng `RestClient`:
+- Connect timeout 2s, read timeout 3s; lỗi mạng → `503 EXCHANGE_RATE_UNAVAILABLE`.
+- Cache kết quả 10 phút (tạm dùng `ConcurrentHashMap` + thời điểm lấy; Module 14 sẽ thay bằng `@Cacheable`).
+- Endpoint `GET /api/v1/books/{id}/price?currency=USD` trả giá sách đã quy đổi.
+- Test bằng `MockRestServiceServer`: thành công, đối tác trả 500, đối tác trả JSON thiếu trường.
+
+**H5.** Chạy spring-playground, gọi `/m11/external/rates?delayMs=5000` từ 3 terminal **cùng lúc**, rồi đổi read timeout thành 30 giây và gọi lại. Giải thích điều gì xảy ra với thread của Tomcat trong trường hợp thứ hai nếu có 500 người cùng gọi.
+
 ## Nhóm G — Tổng hợp (bắt buộc)
 
 **G1. Library REST API hoàn chỉnh.** Nâng Dự án 1 lên thành API thật:
@@ -115,3 +146,7 @@ GET  /api/v1/loans/overdue
 8. Làm sao để API hỗ trợ phân trang hiệu quả với bảng 10 triệu dòng?
 9. Versioning API có những cách nào?
 10. CORS là gì? Vì sao trình duyệt chặn?
+11. Các mức log khác nhau thế nào? Lỗi "không tìm thấy sản phẩm" nên log ở mức nào?
+12. MDC là gì? Vì sao phải `MDC.remove()` trong `finally`?
+13. Gọi API bên ngoài cần chú ý những gì? Vì sao thiếu timeout có thể làm sập cả ứng dụng?
+14. Khi nào nên retry, khi nào không? Idempotency key dùng để làm gì?

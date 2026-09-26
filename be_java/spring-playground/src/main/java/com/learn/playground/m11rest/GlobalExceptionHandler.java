@@ -15,7 +15,6 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Module 11 — một nơi duy nhất biến MỌI exception thành JSON thống nhất.
@@ -42,6 +41,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleConflict(BookService.ConflictException e,
                                                          HttpServletRequest req) {
         return build(HttpStatus.CONFLICT, "ISBN_DUPLICATED", e.getMessage(), req, null);
+    }
+
+    /** API bên ngoài chậm/lỗi -> 503 của CHÍNH MÌNH, kèm thông báo dễ hiểu (không phải 500). */
+    @ExceptionHandler(ExternalApiController.PartnerUnavailableException.class)
+    public ResponseEntity<ErrorResponse> handlePartner(ExternalApiController.PartnerUnavailableException e,
+                                                       HttpServletRequest req) {
+        return build(HttpStatus.SERVICE_UNAVAILABLE, "PARTNER_UNAVAILABLE", e.getMessage(), req, null);
     }
 
     /** Lỗi @Valid trên @RequestBody -> gom thành map field -> thông báo. */
@@ -80,7 +86,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleAll(Exception e, HttpServletRequest req) {
-        String traceId = UUID.randomUUID().toString().substring(0, 8);
+        String traceId = RequestIdFilter.currentRequestId();   // cùng mã với mọi dòng log của request này
         log.error("[{}] Lỗi không mong đợi tại {}", traceId, req.getRequestURI(), e);
 
         ErrorResponse body = new ErrorResponse(Instant.now(), 500, "Internal Server Error",
@@ -91,7 +97,7 @@ public class GlobalExceptionHandler {
 
     private ResponseEntity<ErrorResponse> build(HttpStatus status, String code, String message,
                                                 HttpServletRequest req, Map<String, String> fields) {
-        String traceId = UUID.randomUUID().toString().substring(0, 8);
+        String traceId = RequestIdFilter.currentRequestId();
         log.debug("[{}] {} tại {}: {}", traceId, code, req.getRequestURI(), message);
 
         return ResponseEntity.status(status).body(new ErrorResponse(

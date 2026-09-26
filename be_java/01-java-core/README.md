@@ -388,4 +388,4 @@ String dc = sc.nextLine();
 java 01-java-core/src/Basics.java
 ```
 
-👉 Làm [bai-tap.md](bai-tap.md) (12 bài) rồi sang [Module 02 — OOP](../02-oop/).
+👉 Làm [bai-tap.md](bai-tap.md) (bài chính) và [luyen-tay.md](luyen-tay.md) (40 bài nhỏ luyện phản xạ) rồi sang [Module 02 — OOP](../02-oop/).

@@ -1,6 +1,9 @@
 # Bài code phỏng vấn — dạng bài & chiến lược
 
 > Ở Việt Nam, vòng code cho Fresher/Junior Java Backend thường là: 1–2 bài thuật toán mức dễ–trung bình, hoặc một bài "viết API nhỏ", hoặc live coding trên màn hình chung.
+>
+> Nền tảng giải thuật (Big-O, hai con trỏ, cửa sổ trượt, BFS/DFS, quy hoạch động) và lộ trình luyện bài theo dạng nằm ở
+> [Module 03b — Cấu trúc dữ liệu & Giải thuật](../03b-dsa/). File này tập trung vào **chiến lược làm bài** khi phỏng vấn.
 
 ---
 

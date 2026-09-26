@@ -158,6 +158,85 @@ application-local.yml
 ```
 **Không bao giờ commit**: mật khẩu, API key, file `.env`, file build.
 
+### 2.7 Làm việc nhóm: branch, Pull Request & code review
+
+Ở công ty bạn **không bao giờ** push thẳng lên `main`. Mọi thay đổi đi qua quy trình:
+
+```
+main ──●──────────────●────────────●───►   (luôn chạy được, được bảo vệ: cấm push trực tiếp)
+        \            / (squash merge)
+         ●──●──●────●   feature/SHOP-123-them-voucher
+         code  push  PR -> CI xanh -> review -> sửa -> approve -> merge
+```
+
+**Quy trình một ngày làm việc điển hình:**
+```bash
+git switch main && git pull                        # 1. lấy code mới nhất
+git switch -c feature/SHOP-123-them-voucher        # 2. nhánh mới, đặt tên theo mã ticket
+# ... code, commit nhỏ thường xuyên ...
+git fetch origin && git rebase origin/main         # 3. cập nhật theo main (xem ghi chú bên dưới)
+git push -u origin feature/SHOP-123-them-voucher   # 4. đẩy lên
+# 5. mở Pull Request (GitHub) / Merge Request (GitLab) trên web
+```
+
+**Chiến lược nhánh** — phần lớn team hiện nay dùng **trunk-based / GitHub flow**: chỉ có `main` + các nhánh feature sống ngắn (1–3 ngày), merge thường xuyên. **Git flow** (có thêm `develop`, `release/*`, `hotfix/*`) vẫn gặp ở dự án phát hành theo đợt (ngân hàng, outsource). Vào team nào thì hỏi team đó dùng gì.
+
+**Merge hay rebase?**
+- `git merge origin/main` vào nhánh của bạn: an toàn, sinh thêm commit merge.
+- `git rebase origin/main`: đặt các commit của bạn lên đầu main, lịch sử thẳng. **Chỉ rebase nhánh của riêng bạn**; sau khi rebase một nhánh đã push thì phải `git push --force-with-lease` (không dùng `--force` trần: `--force-with-lease` từ chối nếu người khác vừa push lên nhánh đó).
+
+**Xử lý conflict:**
+```bash
+git rebase origin/main          # báo CONFLICT ở OrderService.java
+# mở file, tìm các đoạn:
+# <<<<<<< HEAD          (code trên main)
+# =======
+# >>>>>>> abc123        (code của bạn)
+# sửa thành bản đúng (thường là KẾT HỢP cả hai), xóa các dòng đánh dấu
+git add OrderService.java
+git rebase --continue           # hoặc git rebase --abort để hủy, quay về như trước
+mvn test                        # BẮT BUỘC chạy lại test: hết conflict không có nghĩa là code đúng
+```
+
+**Một Pull Request tốt:**
+- **Nhỏ**: dưới ~400 dòng thay đổi. PR 2.000 dòng sẽ được "LGTM" cho qua mà không ai đọc kỹ.
+- **Một mục đích**: không trộn sửa bug + refactor + đổi format trong cùng PR.
+- **Mô tả rõ**:
+  ```markdown
+  ## Vì sao
+  SHOP-123: khách muốn nhập mã giảm giá khi thanh toán.
+
+  ## Thay đổi
+  - Thêm bảng `vouchers` (migration V7)
+  - `POST /api/v1/orders` nhận thêm `voucherCode` (tùy chọn, tương thích ngược)
+  - Voucher hết hạn/hết lượt -> 409 VOUCHER_INVALID
+
+  ## Kiểm thử
+  - Unit test VoucherServiceTest (8 case), integration test OrderFlowIT
+  - Đã thử tay bằng api.http
+
+  ## Lưu ý khi deploy
+  Chạy migration trước khi deploy bản mới.
+  ```
+- **CI xanh** trước khi nhờ review. **Tự review** diff của mình trên web trước — bạn sẽ tự bắt được một nửa lỗi.
+
+**Khi review code người khác**, xem theo thứ tự ưu tiên:
+1. **Đúng không?** Logic, trường hợp biên (null, rỗng, số âm), xử lý lỗi, đồng thời (race condition).
+2. **An toàn không?** SQL injection, thiếu kiểm tra quyền (IDOR), lộ dữ liệu nhạy cảm trong log/response.
+3. **Hiệu năng?** N+1, gọi DB/API trong vòng lặp, thiếu index, thiếu phân trang.
+4. **Có test không?** Test có thật sự kiểm tra hành vi hay chỉ để tăng coverage?
+5. **Dễ đọc không?** Tên biến, hàm quá dài, trùng lặp.
+6. Format/style → để **công cụ** lo (formatter, Checkstyle, Spotless), không tốn công review.
+
+Viết comment về **code**, không về **người**; đưa lý do và gợi ý:
+```
+❌ "Sai rồi."
+✅ "Chỗ này gọi findById trong vòng lặp nên sẽ ra N+1 query khi danh sách dài.
+    Dùng findAllById(ids) một lần được không?"
+✅ "nit: tên `data2` hơi khó hiểu, đổi thành `activeVouchers`?"   (nit = góp ý nhỏ, không bắt buộc)
+```
+**Khi nhận review**: đừng tự ái — review là cho code, không phải cho bạn. Sửa xong thì trả lời từng comment ("Đã sửa ở commit abc123" hoặc giải thích vì sao giữ nguyên), không tự bấm "Resolve" comment của người khác.
+
 ## Phần 3 — Testing (phần quan trọng nhất module này)
 
 ### 3.1 Vì sao viết test?

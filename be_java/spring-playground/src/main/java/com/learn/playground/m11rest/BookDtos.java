@@ -20,7 +20,7 @@ public final class BookDtos {
     public record CreateBookRequest(
 
             @NotBlank(message = "ISBN không được để trống")
-            @Pattern(regexp = "\d{3}-\d{4}", message = "ISBN phải có dạng 978-1234")
+            @Pattern(regexp = "\\d{3}-\\d{4}", message = "ISBN phải có dạng 978-1234")
             String isbn,
 
             @NotBlank(message = "Tên sách không được để trống")

@@ -17,7 +17,7 @@ Rồi mở **http://localhost:8080/** — trang chủ liệt kê toàn bộ endp
 - Xem dữ liệu: http://localhost:8080/h2-console (JDBC URL `jdbc:h2:mem:playground`, user `sa`, password rỗng)
 
 ```bash
-mvn test          # 10 test kiểm chứng đúng các bài học bên dưới
+mvn test          # 17 test kiểm chứng đúng các bài học bên dưới
 ```
 
 > **Quan trọng: vừa gọi API vừa đọc console.** Một nửa bài học nằm ở log SQL và log của aspect,
@@ -47,6 +47,10 @@ mvn test          # 10 test kiểm chứng đúng các bài học bên dưới
 | `GET /api/v1/books/99999` | `404` đúng định dạng `ErrorResponse` chung |
 | `GET /api/v1/books/abc` | `400 TYPE_MISMATCH` — lỗi hay bị quên xử lý |
 | `GET /api/v1/books/boom` | `500` nhưng **không lộ stacktrace**, chỉ trả `traceId` để tra log |
+| *(mọi request)* | Console có `[requestId]` trên mọi dòng log; response có header `X-Request-Id` trùng `traceId` của lỗi |
+| `GET /m11/external/rates` | Gọi API "đối tác" bằng `RestClient`, chuyển tiếp `X-Request-Id` — log hai bên cùng một mã |
+| `GET /m11/external/rates?delayMs=5000` | Đối tác chậm → read timeout 2s → `503 PARTNER_UNAVAILABLE`, thread **không** bị treo 5s |
+| `GET /m11/external/flaky` | Đối tác lỗi `503` hai lần → retry có backoff 100ms, 200ms → thành công lần 3 |
 
 ### [Module 12 — Spring Data JPA](../12-spring-data-jpa/) → `m12jpa/`
 
